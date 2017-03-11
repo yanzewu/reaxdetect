@@ -1,17 +1,110 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="源文件">
+    <Filter Include="source">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="头文件">
+    <Filter Include="head">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="资源文件">
+    <Filter Include="head\management">
+      <UniqueIdentifier>{7fe3310e-25ef-4c6d-8917-fc3b3a8f511f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="head\tools">
+      <UniqueIdentifier>{ec42c2f4-ace0-4a5e-8041-ca5c9fb01edb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="trajectory.h">
+      <Filter>head</Filter>
+    </ClInclude>
+    <ClInclude Include="reaxdetect.h">
+      <Filter>head\management</Filter>
+    </ClInclude>
+    <ClInclude Include="typedef.h">
+      <Filter>head\management</Filter>
+    </ClInclude>
+    <ClInclude Include="smiles.h">
+      <Filter>head</Filter>
+    </ClInclude>
+    <ClInclude Include="confighandler.h">
+      <Filter>head\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="elementname.h">
+      <Filter>head\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="filenamehandler.h">
+      <Filter>head\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="includes.h">
+      <Filter>head\management</Filter>
+    </ClInclude>
+    <ClInclude Include="listhandler.h">
+      <Filter>head\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="stringconvert.h">
+      <Filter>head\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="simulation.h">
+      <Filter>head</Filter>
+    </ClInclude>
+    <ClInclude Include="reaxreader.h">
+      <Filter>head</Filter>
+    </ClInclude>
+    <ClInclude Include="numarray.h">
+      <Filter>head\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="datawriter.h">
+      <Filter>head</Filter>
+    </ClInclude>
+    <ClInclude Include="analyzer.h">
+      <Filter>head</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="trajectory.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="smiles.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="reaxdetect.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="reaxreader_reac.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="reaxreader.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="reaxreader_mol.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="datawriter.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="stringconvert.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="analyzer.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="filenamehandler.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="update.txt">
+      <Filter>head</Filter>
+    </Text>
   </ItemGroup>
 </Project>
