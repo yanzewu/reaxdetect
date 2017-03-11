@@ -26,7 +26,7 @@ public:
 
 	Arrayd species_life;
 	Arrayd kp, km;
-	Arrayd kp_err[2], km_err[2];
+	Arrayd kp_range[2], km_range[2];
 	Array rp, rm;
 
 	struct Config {
@@ -51,7 +51,7 @@ private:
 
 	void CalcMolLife(const ReaxReader& rs, double timeStep);
 	void CalculateRateConstant(const ReaxReader& rs, double timeStep, double volume, double confidence, double collideRatio);
-	void FixSample(const ReaxReader&, tsize_t sample_int, tsize_t range, double interval);
+	void FixSample(const ReaxReader&, tsize_t sample_int, tsize_t range, double interval, double volume);
 
 	static double get_confidence(double confidence);
 

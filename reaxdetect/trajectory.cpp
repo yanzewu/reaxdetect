@@ -55,12 +55,14 @@ int TrajReader::ReadTrjFrame(Frame& frameOut) {
 	char buffer[LINE_LENGTH];
 
 	trjfile >> buffer >> frameHeadLength;
+	if (buffer[0] == '\0')return 0;
 	/*	infile.seekg(frameHeadLength, ios_base::cur);	*/
 
 	for (int i = 0; i < frameHeadLength / LINE_LENGTH + 2; i++)
 		trjfile.getline(buffer, LINE_LENGTH, '\n');
 
 	if (config.read_atompos) {
+		frameOut.atoms.clear();
 		for (int i = 0; i < atomTypes.size() - 1; i++) {
 			atom crtAtom; double q;
 			trjfile >> crtAtom.id >> crtAtom.x >> crtAtom.y >> crtAtom.z >> q;
@@ -76,6 +78,7 @@ int TrajReader::ReadTrjFrame(Frame& frameOut) {
 	int bondNumber;
 	trjfile.getline(buffer, LINE_LENGTH, ',');
 	trjfile >> bondNumber;
+	frameOut.bonds.clear();
 	for (int i = 0; i < bondNumber; i++) {
 		bond crtBond; double length, order;
 		trjfile >> crtBond.id_1 >> crtBond.id_2 >> length >> order;

@@ -18,7 +18,7 @@
 #define ERROR_BAD_OUTPUT	0x04
 #define ERROR_NO_EXEC	0x08
 
-ReaxDetect::ReaxDetect() : reader(nullptr) {
+ReaxDetect::ReaxDetect() {
 }
 
 int ReaxDetect::init(int argc, char** argv) {
@@ -82,6 +82,7 @@ int ReaxDetect::exec() {
 
 	printf("Reading File...\n");
 	ReaxDataWriter writer;
+	ReaxReader reader;
 
 	switch (file_type)
 	{
@@ -91,29 +92,34 @@ int ReaxDetect::exec() {
 				error(ERROR_BAD_INPUT);
 			}
 			printf("\n");
-			reader->HandleData(traj, simulation);
+			reader.HandleData(traj, simulation);
 		}
 		break;
 	case ReaxDetect::RAWDATA_FILE:
-		if (writer.ReadData(input_path, *reader, &simulation)) {
+		if (writer.ReadData(input_path, reader, &simulation)) {
 			error(ERROR_BAD_INPUT);
 		}
 		break;
 	default:
 		return 1;
 	}
-	if (write_option.write_fulldata && writer.Dump(input_name + "_full_dump.csv", input_name + "_full_reac.csv", *reader, simulation.timeStep)) {
+	if (write_option.write_fulldata && writer.Dump(input_name + "_full_dump.csv", input_name + "_full_reac.csv", reader, simulation.timeStep)) {
 		error(ERROR_BAD_OUTPUT);
 	}
-	if (write_option.write_rawdata && writer.WriteData(input_name + ".rwdx", *reader, simulation)) {
+	if (write_option.write_rawdata && writer.WriteData(input_name + ".rwdx", reader, simulation)) {
 		error(ERROR_BAD_OUTPUT);
 	}
 	if (write_option.write_kineticfile) {
 		printf("Analysing Kinetic Results...\n");
 		ReaxAnalyzer analyzer(config_analyzer);
-		analyzer.HandleData(*reader, simulation);
-		writer.WriteKineticFile(input_name + ".rkd", analyzer);
-		writer.WriteSample(input_name + "_sample.csv", analyzer);
+		analyzer.HandleData(reader, simulation);
+		writer.WriteReport(input_name + "_report.csv", analyzer);
+		if (writer.WriteKineticFile(input_name + ".rkd", analyzer)) {
+			error(ERROR_BAD_OUTPUT);
+		}
+		if (writer.WriteSample(input_name + "_sample.csv", analyzer)) {
+			error(ERROR_BAD_OUTPUT);
+		}
 	}
 	printf("Finished Successfully.\n");
 	return 0;
@@ -220,8 +226,4 @@ void ReaxDetect::display_help() {
 	printf("Reaction Detector:\n");
 	printf("reaxdetect [-v volume] [-s samplerange] [-c config] [-h help] input_file\n");
 	printf("--version, --help, --dump [dumpoption=nodump/full]\n");
-}
-ReaxDetect::~ReaxDetect() {
-	if (reader)
-		delete reader;
 }

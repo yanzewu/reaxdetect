@@ -1,7 +1,12 @@
 #pragma once
-#include"includes.h"
 #ifndef SMILES_H
 #define SMILES_H
+
+#include <vector>
+#include <string>
+#include <list>
+
+using namespace std;
 
 /* Written in 9/5/2016. Version 1.1. */
 

@@ -18,7 +18,6 @@
 class ReaxDetect {
 public:
 	ReaxDetect();
-	~ReaxDetect();
 
 	// initialize arguments
 	int init(int argc, char** argv);
@@ -42,7 +41,6 @@ private:
 
 	Simulation simulation;
 	ConfigReader cfg_reader;
-	ReaxReader* reader;
 	ReaxAnalyzer::Config config_analyzer;
 	TrajReader::Config config_traj;
 

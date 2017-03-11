@@ -21,16 +21,20 @@ int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 	TrajReader::Frame _frame;
 	int i = 0;
 	while (reader.ReadTrjFrame(_frame)) {
-		printf("Reading frame %d\r", i);
-		RecognizeMolecule(_frame, fss[i], _crt_buffer_idx, simulation.atomNumber, reader.atomWeights);
-		if (i > 0)RecognizeReaction(_frame, fss[i], _crt_buffer_idx, _prev_buffer_idx);
+		if (i % 1000 == 0) {
+			printf("Reading frame %d\r", i);
+		}
+		FrameStat fstat;
+		RecognizeMolecule(_frame, fstat, _crt_buffer_idx, simulation.atomNumber, reader.atomWeights);
+		if (i > 0)RecognizeReaction(_frame, fstat, _crt_buffer_idx, _prev_buffer_idx);
+		fss.push_back(fstat);
 		SwapBuffer();
 		i++;
 	}
 
 	for (auto& mol : molecules) {
 		mol.compile();
-		species.push_back(mol.toSmiles());
+		species.push_back(mol.toString());
 	}
 
 	//alignment
