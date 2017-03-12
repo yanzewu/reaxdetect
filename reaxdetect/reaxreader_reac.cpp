@@ -1,5 +1,5 @@
-#include "reaxreader.h"
 #include <string>
+#include "reaxreader.h"
 
 bool ReaxReader::Reaction::check_valid()
 {

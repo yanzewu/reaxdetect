@@ -29,15 +29,20 @@ bool ReaxReader::MatMolecule::operator==(const MatMolecule& othermlc)const {
 smiles ReaxReader::MatMolecule::to_smiles()const {
 	//O(N)
 	smiles sms;
-	unsigned int i = 0;
-	//int atomrpos = new int[pbondmatrix->size()];
-	vector<int> atomrpos(pbondmatrix->size());
+	tsize_t i = 0;
+	Array atomrpos(pbondmatrix->size(), -2);
 	for (const auto& atom : atoms) {
 		if (isterminalhydrogen((*pscores)[atom])) {
 			atomrpos[atom] = -1;
 			continue;//no terminal hydrogen
 		}
-		sms.push_back(tmpscore2score((*pscores)[atom]));
+		else if ((*pscores)[atom] == maxnhcon * maxhnum + 1) {	// (X-)H-H
+			if (atomrpos[(*pbondmatrix)[atom].front()] == -2) {
+				atomrpos[atom] = -1;
+				continue;
+			}
+		}
+		sms._push_back(tmpscore2score((*pscores)[atom]));
 		atomrpos[atom] = i;
 		i++;
 	}
@@ -46,11 +51,10 @@ smiles ReaxReader::MatMolecule::to_smiles()const {
 	for (const auto& atom : atoms) {
 		if (atomrpos[atom] < 0)continue;
 		for (const auto& child : (*pbondmatrix)[atom]) {
-			if (atomrpos[child] >= 0)sms.push_child(i, atomrpos[child]);
+			if (atomrpos[child] >= 0)sms._push_child(i, atomrpos[child]);
 		}
 		i++;
 	}
-	//delete[] atomrpos;
-	sms.localconvert();
+	sms.canonicalize();
 	return sms;
 }

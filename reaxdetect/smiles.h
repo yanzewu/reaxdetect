@@ -1,79 +1,77 @@
+/*
+A canonical SMILES implementation.
+Last modified in 2017, by Yanze Wu.
+*/
+
 #pragma once
+
 #ifndef SMILES_H
 #define SMILES_H
 
 #include <vector>
-#include <string>
 #include <list>
-
-using namespace std;
-
-/* Written in 9/5/2016. Version 1.1. */
-
-#define SMILESVERSION 101
+#include <map>
 
 #define maxhnum		0x08
 #define maxnhcon	0x08
 #define maxatmwht	0x80
 
-//A uniquely representation of a molecule, canonical smiles
+using namespace std;
+
 class smiles {
 public:
 	smiles() {}
-	bool operator==(const smiles&)const;
 
-	//kernel convert function
-	void localconvert();
-	
-	//Write the string form in symbol
-	void compile();
+	//push an atom back with smiles score. do not use directly.
+	void _push_back(int score);
 
-	/* interface for generating functions */
+	//push a child to an atom without changing score. do not use directly.
+	void _push_child(int parent, int child);
 
-	//push a atom back with smiles score
-	void push_back(int score) {
-		atoms.push_back(snode(score));
-	}
+	//push an atom back with weight, hydrogennumber (-1 for default hydrogen)
+	void push_atom(int weight, int hydrogen=-1);
 
 	//connect a parent with child
-	void push_child(int parent, int index) {
-		atoms[parent].children.push_back(index);
-	}
-
-	//return the number of atom with certain atom weight
-	int has_element(int weight)const;
+	void connect_atom(int atom1, int atom2, bool change_hydrogen=true);
 
 	//number of atoms
-	size_t size() { return atoms.size(); }
+	size_t size()const { return atoms.size(); }
 
-	//output smiles. Just for compability.
-	string toString()const { return symbol; }
+	//return the number of atom with certain atom weight
+	int element_num(int weight)const;
 
-	//output smiles. Valid only after compile();
-	string toSmiles()const { return symbol; }
+	bool operator==(const smiles&)const;
+
+
+	//turning a smiles into a canonical smiles
+	void canonicalize();
+	
+	//Write the string form in symbol
+	void compile(bool hydrogen=true);
+
+	//output smiles without check if compiled before.
+	string to_string()const { return symbol; }
+
+	//output smiles.
+	string to_smiles(bool hydrogen=true);
 
 	//read smiles string. This function may contain error.
-	void readSmiles(const string& sms);
+	void read_smiles(const string& sms, bool read_hydrogen=true);
 
 	//written binary form. Do not use directly.
-	unsigned int toBin(int* buffer)const;
+	unsigned int to_bin(char* buffer)const;
 
 	//read binary form. Do not use directly.
-	void readBin(int* buffer);
+	void read_bin(char* buffer);
 
-protected:
+private:
 	struct snode {
 		int score;
 		list<int> children;
 		snode() { score = 0; }
 		snode(int _score) { score = _score; }
-		void swap(snode& other) {
-			std::swap(score, other.score);
-			children.swap(other.children);
-		}
 	};							//children tree node.
 	vector<snode> atoms;		//atom list
-	vector<int> looproots;		//roots of loop. See documentation for details.
 	string symbol;				//string of chain.
 
 	/* functions used in converting */
@@ -93,16 +91,23 @@ protected:
 	/* functions used in compiling */
 
 	//scans the loop of smiles, and write into looproots
-	void scanloop(int index, int parent, bool* mark);
+	void scanloop(int index, int parent, vector<list<int> >& children_list, vector<pair<int, int> >&, bool* mark)const;
 
 	//recursive compile function. Do not use directly.
-	void compilepart(int index, const vector<string>& loopmark);
+	string compilepart(int index, vector<list<int> >& children_list, const vector<string>& loopmark, bool hydrogen)const;
 
-	//turn score to weight
+	//interpreter atom symbol
+	int read_atom(const string& input, map<int, int>& loops, bool hydrogen=true);
+
+	// turn data into score
+	static int to_score(int weight, int hydrogen, int connection);
+
+	// atom score to hydrogen number
+	static int score2hydro(int score);
+	
+	// atom score to weight
 	static int score2weight(int score);
 
-	//turn score to hydrogen numbers
-	static int score2hydro(int score);
 };
 
 

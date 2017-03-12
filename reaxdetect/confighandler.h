@@ -11,7 +11,7 @@ using namespace std;
 class ConfigReader {
 
 public:
-	string& operator[](string itemName) {
+	string& operator[](const string& itemName) {
 		return _items[itemName];
 	}
 
@@ -27,7 +27,10 @@ public:
 			char buffer[256];
 			while (file.getline(buffer, 256)) {
 				auto split_result = split(buffer);
-				if (split_result.size() <= 1)runtime_error("Config: Invalid Argument!");
+				if (split_result.size() <= 1) {
+					printf("Error: Invalid Argument for config input!\n");
+					exit(1);
+				}
 				_items[split_result[0]] = split_result[1];
 			}
 		}

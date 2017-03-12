@@ -5,12 +5,13 @@
 #include <unistd.h>
 #else
 #include <io.h>
+#define access _access
 #define F_OK 0
 #endif // __unix__
 
 namespace path {
 	bool exists(const string& path) {
-		return _access(path.c_str(), F_OK) == 0;
+		return access(path.c_str(), F_OK) == 0;
 	}
 
 	string get_path(const string& path) {

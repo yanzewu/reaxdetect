@@ -33,8 +33,7 @@ int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 	}
 
 	for (auto& mol : molecules) {
-		mol.compile();
-		species.push_back(mol.toString());
+		species.push_back(mol.to_smiles());
 	}
 
 	//alignment
@@ -155,11 +154,11 @@ void ReaxReader::Check()
 
 	for (auto i = 0; i < molecules.size(); i++) {
 		for (auto j = 0; j < i; j++) {
-			if (molecules[i].toString() == molecules[j].toString()) {
+			if (molecules[i].to_string() == molecules[j].to_string()) {
 				cerr << "Warning: Molecules " << i << " and " << j << " have the same name!\n";
 				log << "Warning: Molecules " << i << " and " << j << " have the same name!\n";
-				cerr << "name is: " << molecules[i].toString() << "\n";
-				log << "name is: " << molecules[i].toString() << "\n";
+				cerr << "name is: " << molecules[i].to_string() << "\n";
+				log << "name is: " << molecules[i].to_string() << "\n";
 			}
 		}
 	}
@@ -180,8 +179,8 @@ void ReaxReader::Check()
 					<< "," << fss[i - 1].mol_freq[k] << "," << fss[i].mol_freq[k] << ")\n";
 				log << "Number of molecule " << k << " cannot match. (" << dc[k]
 					<< "," << fss[i - 1].mol_freq[k] << "," << fss[i].mol_freq[k] << ")\n";
-				cerr << "name is: " << molecules[k].toString() << "\n";
-				log << "name is: " << molecules[k].toString() << "\n";
+				cerr << "name is: " << molecules[k].to_string() << "\n";
+				log << "name is: " << molecules[k].to_string() << "\n";
 			}
 		}
 	}

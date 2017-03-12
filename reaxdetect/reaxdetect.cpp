@@ -25,7 +25,8 @@ int ReaxDetect::init(int argc, char** argv) {
 
 	if (argc < 2) {
 		display_version();
-		return 0;
+		exit(0);
+		return 1;
 	}
 
 	set_default_opt();
@@ -219,8 +220,7 @@ void ReaxDetect::set_default_opt()
 }
 
 void ReaxDetect::display_version() {
-	printf("Reaction Detector: Version %d.%d.%d, Smiles Version %d.%d",
-		MYVERSION / 10000, (MYVERSION / 100) % 100, MYVERSION % 100, SMILESVERSION / 100, SMILESVERSION % 100);
+	printf("Reaction Detector: Version %d.%d.%d\n", MYVERSION / 10000, (MYVERSION / 100) % 100, MYVERSION % 100);
 }
 void ReaxDetect::display_help() {
 	printf("Reaction Detector:\n");

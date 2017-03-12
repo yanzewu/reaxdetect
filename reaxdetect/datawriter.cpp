@@ -43,7 +43,7 @@ int ReaxDataWriter::ReadData(const string & path, ReaxReader & reader, Simulatio
 	for (auto& s : reader.molecules) {
 		infile.read((char*)&size, sizeof(size));
 		infile.read((char*)buffer, size);
-		s.readBin(buffer);
+		s.read_bin((char*)buffer);
 		infile.read((char*)buffer, sizeof(int)); if (buffer[0] != ElementMark)return 1;//endmark check
 	}
 	infile.read((char*)buffer, sizeof(int)); if (buffer[0] != BlockMark)return 1;//Blockmark check
@@ -78,7 +78,7 @@ int ReaxDataWriter::ReadData(const string & path, ReaxReader & reader, Simulatio
 			datas.assign((diint*)buffer, (diint*)buffer + size);
 			infile.read((char*)&buffer, size * sizeof(poses[0]));
 			poses.assign((tsize_t*)buffer, (tsize_t*)buffer + size);
-			for (int i = 0; i < size; i++) {
+			for (size_t i = 0; i < size; i++) {
 				fs.reaction_freq[poses[i]] = datas[i];
 			}
 		}
@@ -86,7 +86,7 @@ int ReaxDataWriter::ReadData(const string & path, ReaxReader & reader, Simulatio
 	}
 	infile.close();
 	for (auto& mol : reader.molecules) {
-		reader.species.push_back(mol.toString());
+		reader.species.push_back(mol.to_smiles());
 	}
 	return 0;
 }
@@ -118,7 +118,7 @@ int ReaxDataWriter::WriteData(const string& path, const ReaxReader& reader, cons
 	outfile.write((char*)&size, sizeof(size));
 	for (auto sms = reader.molecules.begin(); sms < reader.molecules.end(); sms++) {
 		char buffer[255];
-		size = sms->toBin((int*)buffer);
+		size = sms->to_bin(buffer);
 		outfile.write((char*)&size, sizeof(size));
 		outfile.write(buffer, size);
 		outfile.write((char*)&ElementMark, sizeof(ElementMark));
@@ -145,13 +145,6 @@ int ReaxDataWriter::WriteData(const string& path, const ReaxReader& reader, cons
 		vwrite(outfile, fs.mol_freq);
 		outfile.write((char*)&ElementMark, sizeof(ElementMark));
 		vwrite(outfile, fs.reaction_freq);
-		/*
-		size = fs.reaction_freq.datas.size();
-		outfile.write((char*)&size, sizeof(size));
-		if (fs.reaction_freq.datas.size() > 0) {
-			outfile.write((char*)&(fs.reaction_freq.datas[0]), size * sizeof(fs.reaction_freq.datas[0]));
-			outfile.write((char*)&(fs.reaction_freq.poses[0]), size * sizeof(fs.reaction_freq.poses[0]));
-		}*/
 		outfile.write((char*)&ElementMark, sizeof(ElementMark));
 	}
 	outfile.close();
