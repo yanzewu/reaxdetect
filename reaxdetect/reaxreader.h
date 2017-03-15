@@ -18,6 +18,12 @@ public:
 	typedef vector<list<int> > Matrix;
 	typedef bool* Mark;
 
+	struct Config {
+		size_t buffer_size;
+		Config() : buffer_size(2) {
+		}
+	};
+
 	//Frequecy of molecules and reactions in a frame
 	struct FrameStat {
 		Array mol_freq;
@@ -34,7 +40,8 @@ public:
 		{
 		}
 		bool check_valid();
-		bool operator==(const Reaction& reac)const;
+		bool operator==(const Reaction&)const;
+		bool operator!=(const Reaction&)const;
 		Reaction operator-()const;
 		string to_string(const vector<string>&)const;
 	};
@@ -44,7 +51,9 @@ public:
 	vector<string> species;			// name of species
 	vector<Reaction> reactions;		//List of all different reactions
 
-	ReaxReader() { }
+	ReaxReader() : config() { }
+	ReaxReader(const Config& c) : config(c) {
+	}
 
 	//handles data from trajectory
 	int HandleData(TrajReader&, const Simulation&);//do before output
@@ -66,39 +75,57 @@ protected:
 		}
 		void push_back(int index);
 		bool operator==(const MatMolecule&)const;
+		bool equals_to(MatMolecule&);
 		smiles to_smiles()const;
 	};
 
-	Array _mol_index_buffer[2];	//map of relative index to absolute index	
-	vector<MatMolecule> _mol_buffer[2];		//molecule buffer	
-	Array _mol_of_atom[2];		//map of atom to the molecule who contains it	
-	Matrix _bond_matrix;	//raw data from the bond in one frame	
-	Array _atom_score;			//atom score buffer in one frame
-	TrajReader::Frame _frame_buffer;	//raw frame data
 
-	tsize_t _crt_buffer_idx, _prev_buffer_idx;	//buffer index
+	struct BufferPage {
+		Array mol_idx;	//map of relative index to absolute index	
+		vector<MatMolecule> molecule;		//molecule buffer
+		vector<Reaction> raw_reaction;	// reaction buffer for raw reactions
+		vector<Reaction> reaction;		// real reaction buffer
+		Array mol_of_atom;		//map of atom to the molecule who contains it	
+		Array atom_score;	//raw data from the bond in one frame	
+		Matrix bond_matrix;			//atom score buffer in one frame
+	};
+
+	Config config;
+	BufferPage* _buffer_pages;
+
+	BufferPage* _crt_buffer;
+	list<BufferPage*> _prev_buffer;	//buffer index
 
 	//detect molecule and write crtmol, crtfmi, fss.molfreq
-	void RecognizeMolecule(const TrajReader::Frame& frm, FrameStat& fs, tsize_t crtBufferIndex, int atomNumber, const vector<double>& atomWeights);
+	void RecognizeMolecule(const TrajReader::Frame& frm, const Arrayd& atomWeights, int atomNumber, FrameStat& fs);
 
-	//detect reaction and write fss.reactions, calculate inflow
-	void RecognizeReaction(const TrajReader::Frame& frm, FrameStat& fs, tsize_t crtBufferIndex, tsize_t prevBufferIndex);
+	//detect reaction and write fss.reactions
+	void RecognizeReaction(const TrajReader::Frame& frm);
 	
+	//commit reaction into lists
+	void CommitReaction(FrameStat& fs_commit);
+
+	//initialize buffer pages
+	void InitBuffer(size_t max_atom_idx);
+
 	//swap current buffer and previous buffer. Also do initialize work at the same time.
 	void SwapBuffer();
 
 	/*molecule generating subfunctions*/
 
 	//[DFS] Scan raw scores of each atom. [Do not use directly]
-	void scan_score(int index, const Matrix& bondMatrix, const Arrayd& atomweight, Mark marks,
-		Array& molRoots, Array& scores, Array& molofAtoms);
+	void scan_score(int index, const Arrayd& atom_weights, BufferPage* buffer, Mark marks, Array& molRoots);
 	
 	//[DFS] Scan molecule chain. [Do not use directly]
-	void scan_molecule(int index, const Matrix& bondMatrix, Mark marks, MatMolecule& molecule);
+	void scan_molecule(int index, BufferPage* buffer, Mark marks, MatMolecule& molecule);
 	
 	//[DFS] Scan reaction between two frames. [Do not use directly]
-	void create_reaction(int index, Reaction& reac, tsize_t bufferIndex_1, tsize_t bufferIndex_2,
-		vector<bool>* marks, unsigned char flag);
+	void create_reaction(int index, BufferPage* page_1, BufferPage* page_2,
+		vector<bool>* marks, Reaction& reac, Reaction& raw_reac, unsigned char flag);
+
+	//checking if two raw reactions contains same molecules
+	bool check_reaction(Reaction & reaction_1, BufferPage* buffer_1_prod, BufferPage* buffer_1_reac,
+		Reaction & reaction_2, BufferPage* buffer_2_prod, BufferPage* buffer_2_reac);
 
 	//generate score to raw score
 	static int totmpscore(int weight, int nhcon, int terminalh);

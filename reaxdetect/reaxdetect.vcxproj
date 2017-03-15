@@ -153,6 +153,7 @@
     <ClCompile Include="trajectory.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="makefile" />
     <Text Include="update.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

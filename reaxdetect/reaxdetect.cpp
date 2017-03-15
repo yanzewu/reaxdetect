@@ -1,6 +1,7 @@
 
 #ifdef __unix__
 #include <unistd.h>
+#include <getopt.h>
 #else
 #include "getopt.h"
 #endif
@@ -69,6 +70,8 @@ void ReaxDetect::translate_opt()
 	config_traj.bondorder_cutoff = stod(cfg_reader.get("BondOrderCutoff", "0.5"));
 	config_traj.read_atompos = stob(cfg_reader.get("ReadAtomPos", "false"));
 
+	config_reax.buffer_size = stoul(cfg_reader.get("FrameBufferSize", "4"));
+
 	config_analyzer = ReaxAnalyzer::Config();
 	config_analyzer.confidence = stod(cfg_reader.get("RateConstantConfidence", "0.95"));
 	string sample_method_str = cfg_reader.get("SampleMethod", "fixint");
@@ -83,7 +86,7 @@ int ReaxDetect::exec() {
 
 	printf("Reading File...\n");
 	ReaxDataWriter writer;
-	ReaxReader reader;
+	ReaxReader reader(config_reax);
 
 	switch (file_type)
 	{
@@ -204,7 +207,6 @@ int ReaxDetect::read_opt(int argc, char** argv) {
 		}
 		opt = getopt_long(argc, argv, "c:v:s:h", longOpts, &longIndex);
 	}
-	if (argc <= longIndex)return ERROR_NO_INPUT;
 	input_path = string(argv[argc - 1]);
 	return 0;
 }
@@ -217,6 +219,7 @@ void ReaxDetect::set_default_opt()
 	cfg_reader["SampleRange"] = "1000";
 	cfg_reader["RateConstantConfidence"] = "0.95";
 	cfg_reader["ReadAtomPos"] = "false";
+	cfg_reader["FrameBufferSize"] = "4";
 }
 
 void ReaxDetect::display_version() {

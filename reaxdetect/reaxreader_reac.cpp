@@ -1,20 +1,22 @@
 #include <string>
 #include "reaxreader.h"
+#include "listhandler.h"
 
 bool ReaxReader::Reaction::check_valid()
 {
-	sort(reagants.begin(), reagants.end(), less<int>());
-	sort(products.begin(), products.end(), less<int>());
-
-	return (reagants != products);
+	return !contain_equal(reagants, products, less<int>(), equal_to<int>());
 }
 ReaxReader::Reaction ReaxReader::Reaction::operator-()const {
 	return ReaxReader::Reaction(products, reagants);
 }
 
-bool ReaxReader::Reaction::operator==(const Reaction & reac) const
+bool ReaxReader::Reaction::operator==(const Reaction & reaction) const
 {
-	return (reagants == reac.reagants) & (products == reac.products);
+	return (reagants == reaction.reagants) & (products == reaction.products);
+}
+bool ReaxReader::Reaction::operator!=(const Reaction & reaction) const
+{
+	return (reagants != reaction.reagants) || (products != reaction.products);
 }
 string ReaxReader::Reaction::to_string(const vector<string>& species)const {
 	string out;

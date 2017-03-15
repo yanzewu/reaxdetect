@@ -19,7 +19,7 @@ namespace path {
 			return path;
 		}
 
-		int filecnt = 2;
+		long long filecnt = 2;
 		auto path_split = split(path);
 		string result;
 		while(exists(result = path_split[0] + path_split[1] + "_" + to_string(filecnt) + "." + path_split[2])){

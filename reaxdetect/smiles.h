@@ -20,7 +20,9 @@ using namespace std;
 
 class smiles {
 public:
-	smiles() {}
+	smiles();
+
+	smiles(smiles&&);
 
 	//push an atom back with smiles score. do not use directly.
 	void _push_back(int score);

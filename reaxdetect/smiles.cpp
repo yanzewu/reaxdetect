@@ -37,6 +37,11 @@ int smiles::score2hydro(int score) {
 }
 
 // interface
+smiles::smiles() {
+}
+
+smiles::smiles(smiles&& s) : atoms(move(s.atoms)), symbol(move(s.symbol)) {
+}
 
 void smiles::_push_back(int score) {
 	atoms.push_back(snode(score));

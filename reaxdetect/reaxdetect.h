@@ -43,6 +43,7 @@ private:
 	ConfigReader cfg_reader;
 	ReaxAnalyzer::Config config_analyzer;
 	TrajReader::Config config_traj;
+	ReaxReader::Config config_reax;
 
 	string input_path;
 	string input_name;

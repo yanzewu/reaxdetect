@@ -34,37 +34,42 @@ size_t pushnew2index(unsigned int index, const vector<type>& datas, vector<unsig
 	return indexes.size() - 1;
 }
 
-//sort a index vector by score using bubble sort. Pred means the order of head to tail.
-template<typename type, typename order>
-void sortby(vector<type>& source, const Array& score, const order pred) {
-	for (unsigned int i = 0; i < source.size() - 1; i++) {
-		for (auto source_j = source.begin(); source_j < source.end() - 1 - i; source_j++) {
-			if (pred(score[*(source_j+1)], score[*source_j])) {
-				swap(*source_j, *(source_j + 1));
-			}
-		}
-	}
+// will change content by sorting.
+template<typename container, typename order_sort, typename order_equal>
+bool contain_equal(container& c1, container& c2, order_sort pred_sort, order_equal pred_equal) {
+	sort(c1.begin(), c1.end(), pred_sort);
+	sort(c2.begin(), c2.end(), pred_sort);
+	return (c1.size() == c2.size()) && (equal(c1.begin(), c1.end(), c2.begin(), pred_equal));
 }
 
-//sort a index list by score using bubble sort. Pred means the order of head to tail.
-template<typename container, typename order>
-void sortby(container& source, const Array& score, const order pred) {
-	if (source.empty())return;
-	auto sort_end = source.end();
-	while(sort_end != source.begin()) {
-		auto source_j = source.begin();
-		auto next_j = source_j;
-		next_j++;
+// will change content by sorting.
+template<typename type, typename order_sort, typename order_equal>
+bool contain_equal(list<type>& c1, list<type>& c2, order_sort pred_sort, order_equal pred_equal) {
+	c1.sort(pred_sort);
+	c2.sort(pred_sort);
+	return (c1.size() == c2.size()) && (equal(c1.begin(), c1.end(), c2.begin(), pred_equal));
+}
 
-		while(next_j != sort_end) {
-			if (pred(score[*next_j], score[*source_j])) {
-				swap(*source_j, *next_j);
-			}
-			source_j = next_j;
-			next_j++;
-		}
-		sort_end--;
-	}
+//sort a index list by score. Pred means the order of head to tail.
+template<typename type, typename order>
+void sortby(list<type>& source, const Array& score, order pred) {
+	if (source.empty())return;
+
+	auto _pred = [score, pred](auto x, auto y) {
+		return pred(score[x], score[y]);
+	};
+	source.sort(_pred);
+}
+
+//sort a index list by score. Pred means the order of head to tail.
+template<typename container, typename order>
+void sortby(container& source, const Array& score, order pred) {
+	if (source.empty())return;
+
+	auto _pred = [score, pred](auto x, auto y) {
+		return pred(score[x], score[y]);
+	};
+	sort(source.begin(), source.end(), _pred);
 }
 
 //rank by a exist rank

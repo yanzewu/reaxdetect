@@ -118,8 +118,8 @@ void ReaxAnalyzer::CalculateRateConstant(const ReaxReader& rs, double timeStep, 
 		if (sum_product_m[i] == 0.5)sum_product_m[i] = 1;
 
 		double n = sum_product_p[i];
-		double kp_raw = rp[i] / sum_product_p[i];
-		double km_raw = rm[i] / sum_product_m[i];
+		double kp_raw = (double)rp[i] / sum_product_p[i];
+		double km_raw = (double)rm[i] / sum_product_m[i];
 		double x1 = kp_raw + z*z / (2.0*n);
 		double x2 = z * sqrt(kp_raw * (1 - kp_raw) / n + z*z / (4.0 * n*n));
 
@@ -132,8 +132,14 @@ void ReaxAnalyzer::CalculateRateConstant(const ReaxReader& rs, double timeStep, 
 		km_range[0][i] = (x1 - x2) / (1.0 + z*z / n);
 		km_range[1][i] = (x1 + x2) / (1.0 + z*z / n);
 
-		kp[i] = kp_raw * pow(volume, rs.reactions[i].reagants.size() - 1) / timeStep;
-		km[i] = km_raw * pow(volume, rs.reactions[i].products.size() - 1) / timeStep;
+		double kp_coeff = pow(volume, rs.reactions[i].reagants.size() - 1) / timeStep;
+		double km_coeff = pow(volume, rs.reactions[i].products.size() - 1) / timeStep;
+		kp[i] = kp_raw * kp_coeff;
+		km[i] = km_raw * km_coeff;
+		for (size_t j = 0; j < 2; j++) {
+			kp_range[j][i] *= kp_coeff;
+			km_range[j][i] *= km_coeff;
+		}
 	}
 }
 

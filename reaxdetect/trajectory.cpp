@@ -53,6 +53,7 @@ int TrajReader::ReadTrjFrame(Frame& frameOut) {
 	
 	int frameHeadLength;
 	char buffer[LINE_LENGTH];
+	memset(buffer, 0, LINE_LENGTH);
 
 	trjfile >> buffer >> frameHeadLength;
 	if (buffer[0] == '\0')return 0;
@@ -86,34 +87,3 @@ int TrajReader::ReadTrjFrame(Frame& frameOut) {
 	}
 	return 1;
 }
-
-
-/*
-int TrajReader::ReadTrjFile(const string path, ReaxDetect::GlobalData* simulation, ReaxDetect::Config* cfg) {
-	// updated in 2.2.2, separate details in two other functions.
-
-	// open file
-	trjfile.open(path, ios_base::in);
-	if (!trjfile.is_open())return 1;
-
-	// read head
-	if (ReadTrjHead(path, simulation))return 1;
-
-	// read frames
-	int cnt = 0;
-	int frmNumber = (int)(cfg->valueOf("FrameNumber"));
-	double bondOrderCutoff = cfg->valueOf("BondOrderCutoff");
-	int readAtomPos = (int)cfg->valueOf("ReadAtomPos");
-
-	while (trjfile.peek() != EOF && (frmNumber == 0 || cnt < frmNumber)) {
-		printf("Reading frame %d\r", cnt + 1);
-		frame f;
-		ReadTrjFrame(f, bondOrderCutoff, readAtomPos);
-		if(cnt > 0)frames.push_back(f);	//updated in 2.2.0, to remove uncorrect molecule pack in first frame.
-		cnt++;
-	}
-
-	trjfile.close();
-	frames.pop_back(); //last element will cause uncertainty
-	return 0;
-}*/

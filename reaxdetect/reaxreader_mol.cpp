@@ -1,4 +1,5 @@
 #include "reaxreader.h"
+#include "listhandler.h"
 
 int ReaxReader::totmpscore(int weight, int nhcon, int terminalh) {
 	return (weight * maxnhcon + nhcon) * maxhnum + terminalh;
@@ -25,6 +26,10 @@ bool ReaxReader::MatMolecule::operator==(const MatMolecule& othermlc)const {
 	}
 	return true;
 
+}
+bool ReaxReader::MatMolecule::equals_to(MatMolecule & othermlc)
+{
+	return contain_equal(atoms, othermlc.atoms, less<int>(), equal_to<int>());
 }
 smiles ReaxReader::MatMolecule::to_smiles()const {
 	//O(N)

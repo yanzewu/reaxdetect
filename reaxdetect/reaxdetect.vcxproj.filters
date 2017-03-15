@@ -106,5 +106,6 @@
     <Text Include="update.txt">
       <Filter>head</Filter>
     </Text>
+    <Text Include="makefile" />
   </ItemGroup>
 </Project>
