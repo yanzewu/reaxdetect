@@ -161,7 +161,7 @@ int ReaxDetect::read_opt(int argc, char** argv) {
 		{ "", 0, 0, 0}
 	};
 	int longIndex;
-	int opt = getopt_long(argc, argv, "c:v:s:h", longOpts, &longIndex);
+	int opt = getopt_long(argc, argv, "c:v:s:b:h", longOpts, &longIndex);
 	while (opt != -1) {
 		switch (opt)
 		{
@@ -176,6 +176,9 @@ int ReaxDetect::read_opt(int argc, char** argv) {
 			}
 			break;
 			// volume
+		case 'b':
+			cfg_reader["FrameBufferSize"] = string(optarg);
+			break;
 		case 'v':
 			simulation.volume = atof(optarg);
 			break;
@@ -227,6 +230,6 @@ void ReaxDetect::display_version() {
 }
 void ReaxDetect::display_help() {
 	printf("Reaction Detector:\n");
-	printf("reaxdetect [-v volume] [-s samplerange] [-c config] [-h help] input_file\n");
+	printf("reaxdetect [-v volume] [-s samplerange] [-b buffersize] [-c config] [-h help] input_file\n");
 	printf("--version, --help, --dump [dumpoption=nodump/full]\n");
 }

@@ -12,7 +12,7 @@
 #include "reaxreader.h"
 #include "analyzer.h"
 
-#define MYVERSION 30000
+#define MYVERSION 30001
 
 // main entry for the program
 class ReaxDetect {

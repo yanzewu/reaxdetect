@@ -85,22 +85,18 @@ void ReaxAnalyzer::CalculateRateConstant(const ReaxReader& rs, double timeStep, 
 	auto size = rs.species.size();
 	auto rsize = rs.reactions.size();
 
-	Arrayd c(size, 0);
 	Arrayd sum_product_p(rsize, 0), sum_product_m(rsize, 0);
 	for (auto fs = rs.fss.begin() + 1; fs < rs.fss.end(); fs++) {
 
-		mul_into((fs - 1)->mol_freq + fs->mol_freq, 0.5, c);
-
-		//f_i = freq_i/\Proc(Ave(N_i))
 		for (size_t i = 0; i < rsize; i++) {
 			double product = 1.0;
 			for (const auto& s : rs.reactions[i].reagants)
-				product *= c[s];
+				product *= (double)(fs - 1)->mol_freq[s];
 			sum_product_p[i] += product;
 
 			product = 1.0;
 			for (const auto& s : rs.reactions[i].products)
-				product *= c[s];
+				product *= (double)(fs - 1)->mol_freq[s];
 			sum_product_m[i] += product;
 
 		}
@@ -114,8 +110,6 @@ void ReaxAnalyzer::CalculateRateConstant(const ReaxReader& rs, double timeStep, 
 	}
 
 	for (size_t i = 0; i < rsize; i++) {
-		if (sum_product_p[i] == 0.5)sum_product_p[i] = 1;
-		if (sum_product_m[i] == 0.5)sum_product_m[i] = 1;
 
 		double n = sum_product_p[i];
 		double kp_raw = (double)rp[i] / sum_product_p[i];
