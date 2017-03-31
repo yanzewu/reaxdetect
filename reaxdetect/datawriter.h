@@ -25,6 +25,7 @@ public:
 
 	static int WriteKineticFile(const string& path, const ReaxAnalyzer&);
 
+	static int WriteRawReactionFreq(const string& path, const ReaxAnalyzer&);
 };
 
 #endif // !DATAWRITER_H

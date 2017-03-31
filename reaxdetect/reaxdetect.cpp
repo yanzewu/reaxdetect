@@ -118,6 +118,7 @@ int ReaxDetect::exec() {
 		ReaxAnalyzer analyzer(config_analyzer);
 		analyzer.HandleData(reader, simulation);
 		writer.WriteReport(input_name + "_report.csv", analyzer);
+		writer.WriteRawReactionFreq(input_name + "_rawfreq.csv", analyzer);
 		if (writer.WriteKineticFile(input_name + ".rkd", analyzer)) {
 			error(ERROR_BAD_OUTPUT);
 		}
@@ -208,7 +209,7 @@ int ReaxDetect::read_opt(int argc, char** argv) {
 		default:
 			break;
 		}
-		opt = getopt_long(argc, argv, "c:v:s:h", longOpts, &longIndex);
+		opt = getopt_long(argc, argv, "c:v:s:b:h", longOpts, &longIndex);
 	}
 	input_path = string(argv[argc - 1]);
 	return 0;

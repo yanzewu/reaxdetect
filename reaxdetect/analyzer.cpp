@@ -85,7 +85,8 @@ void ReaxAnalyzer::CalculateRateConstant(const ReaxReader& rs, double timeStep, 
 	auto size = rs.species.size();
 	auto rsize = rs.reactions.size();
 
-	Arrayd sum_product_p(rsize, 0), sum_product_m(rsize, 0);
+	sum_product_p.resize(rsize, 0);
+	sum_product_m.resize(rsize, 0);
 	for (auto fs = rs.fss.begin() + 1; fs < rs.fss.end(); fs++) {
 
 		for (size_t i = 0; i < rsize; i++) {

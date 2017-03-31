@@ -1,6 +1,7 @@
 #include <string>
 #include "reaxreader.h"
 #include "listhandler.h"
+#include "stringconvert.h"
 
 bool ReaxReader::Reaction::check_valid()
 {
@@ -19,15 +20,15 @@ bool ReaxReader::Reaction::operator!=(const Reaction & reaction) const
 	return (reagants != reaction.reagants) || (products != reaction.products);
 }
 string ReaxReader::Reaction::to_string(const vector<string>& species)const {
-	string out;
-	vector<int>::const_iterator iter;
-	for (iter = reagants.begin(); iter < reagants.end() - 1; iter++) {
-		out.append(species[*iter] + "+");
+
+	vector<string> reactants_str, products_str;
+	for (const auto& reactant : reagants){
+		reactants_str.push_back(species[reactant]);
 	}
-	out.append(species[*iter]+ "=");
-	for (iter = products.begin(); iter < products.end() - 1; iter++) {
-		out.append(species[*iter] + "+");
+	sort(reactants_str.begin(), reactants_str.end());
+	for (const auto& product : products) {
+		products_str.push_back(species[product]);
 	}
-	out.append(species[*iter]);
-	return out;
+	sort(products_str.begin(), products_str.end());
+	return join(reactants_str, "+") + "=" + join(products_str, "+");
 }

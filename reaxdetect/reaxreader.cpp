@@ -197,7 +197,7 @@ void ReaxReader::CommitReaction(FrameStat & fs_commit)
 			fs_commit.reaction_freq[iter - reactions.begin()].second++;
 		}
 		else {
-			reactions.push_back(reaction);
+			reactions.push_back(move(reaction));
 			fs_commit.reaction_freq.push_back(diint(1, 0));
 		}
 	}

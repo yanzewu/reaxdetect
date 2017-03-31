@@ -156,15 +156,18 @@ int ReaxDataWriter::Dump(const string& path, const string& path_reac, const Reax
 	ofstream outfile_reac(path_reac, ios_base::out);
 
 	outfile << "time," << join(reader.species);
-	outfile_reac << "time,";
+	outfile_reac << "time";
 	for (const auto& s : reader.reactions) {
-		outfile_reac << s.to_string(reader.species) << ",";
+		outfile_reac << ',' << s.to_string(reader.species) << ',' << (-s).to_string(reader.species);
 	}
 
 	double t = 0;
 	for (const auto& fs : reader.fss) {
 		outfile << "\n" << t << "," << join(fs.mol_freq);
-		outfile_reac << "\n" << t << "," << join(net(fs.reaction_freq));
+		outfile_reac << "\n" << t;
+		for (const auto& f : fs.reaction_freq) {
+			outfile_reac << "," << f.first << "," << f.second;
+		}
 		t += interval;
 	}
 	outfile.close();
@@ -230,5 +233,17 @@ int ReaxDataWriter::WriteKineticFile(const string & path, const ReaxAnalyzer & a
 	outfile << "END" << endl;
 	outfile.close();
 
+	return 0;
+}
+
+int ReaxDataWriter::WriteRawReactionFreq(const string & path, const ReaxAnalyzer & analyzer)
+{
+	ofstream outfile(path, ios_base::out);
+	outfile << "# Reaction,Freq_pro,Base_pro,Freq_con,Base_con" << endl;
+	for (size_t i = 0; i < analyzer.reactions.size(); i++) {
+		outfile << analyzer.reactions[i] << ',' << analyzer.rp[i] << ',' << analyzer.sum_product_p[i]
+			<< ',' << analyzer.rm[i] << ',' << analyzer.sum_product_m[i] << endl;
+	}
+	outfile.close();
 	return 0;
 }
