@@ -16,7 +16,7 @@ public:
 	static int WriteData(const string&, const ReaxReader&, const Simulation&);
 
 	// dump full concentration
-	static int Dump(const string& species_path, const string& reac_path, const ReaxReader&, double interval);
+	static int Dump(const string& species_path, const string& reac_path, const ReaxReader&);
 
 	// sample
 	static int WriteSample(const string&, const ReaxAnalyzer&);

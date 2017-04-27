@@ -23,6 +23,7 @@ public:
 	vector<string> elements;
 	vector<string> species;
 	vector<string> reactions;
+	map<string, int> init;
 
 	Arrayd species_life;
 	Arrayd kp, km;

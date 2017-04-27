@@ -151,7 +151,7 @@ int ReaxDataWriter::WriteData(const string& path, const ReaxReader& reader, cons
 	return 0;
 }
 
-int ReaxDataWriter::Dump(const string& path, const string& path_reac, const ReaxReader& reader, double interval) {
+int ReaxDataWriter::Dump(const string& path, const string& path_reac, const ReaxReader& reader) {
 	ofstream outfile(path, ios_base::out);
 	ofstream outfile_reac(path_reac, ios_base::out);
 
@@ -163,12 +163,11 @@ int ReaxDataWriter::Dump(const string& path, const string& path_reac, const Reax
 
 	double t = 0;
 	for (const auto& fs : reader.fss) {
-		outfile << "\n" << t << "," << join(fs.mol_freq);
-		outfile_reac << "\n" << t;
+		outfile << "\n" << fs.t << "," << join(fs.mol_freq);
+		outfile_reac << "\n" << fs.t;
 		for (const auto& f : fs.reaction_freq) {
 			outfile_reac << "," << f.first << "," << f.second;
 		}
-		t += interval;
 	}
 	outfile.close();
 	outfile_reac.close();
@@ -188,6 +187,10 @@ int ReaxDataWriter::WriteSample(const string& sample_path, const ReaxAnalyzer& a
 	for (const auto& sample : analyzer.samples) {
 		outfile << sample.t << "," << join(sample.r) << "\n";
 	}
+	outfile << "END\nINIT\n";
+	for (const auto& i : analyzer.init) {
+		outfile << i.first << "," << i.second << "\n";
+	}
 	outfile << "END";
 	outfile.close();
 	return 0;
@@ -205,10 +208,7 @@ int ReaxDataWriter::WriteReport(const string & path, const ReaxAnalyzer & analyz
 	outfile << "Reactions\n";
 	outfile << "index,\treaction,\tfreqplus,\tfreqminus,\tkp_real,km_real,\tkp_min,kp_max,\tkm_min,km_max\n";
 	for (size_t i = 0; i < analyzer.reactions.size(); i++) {
-		outfile << i << "," << analyzer.reactions[i] << "," << analyzer.rp[i] << "," << analyzer.rm[i] << "," 
-			<< analyzer.kp[i] << "," << analyzer.km[i] << ",";
-		outfile << analyzer.kp_range[0][i] << "," << analyzer.kp_range[1][i] << ",";
-		outfile << analyzer.km_range[0][i] << "," << analyzer.km_range[1][i] << endl;
+		outfile << i << "," << analyzer.reactions[i] << "," << analyzer.rp[i] << "," << analyzer.rm[i] << ",";
 	}
 
 	outfile.close();
@@ -239,7 +239,7 @@ int ReaxDataWriter::WriteKineticFile(const string & path, const ReaxAnalyzer & a
 int ReaxDataWriter::WriteRawReactionFreq(const string & path, const ReaxAnalyzer & analyzer)
 {
 	ofstream outfile(path, ios_base::out);
-	outfile << "# Reaction,Freq_pro,Base_pro,Freq_con,Base_con" << endl;
+	outfile << "Reaction,Freq_pro,Base_pro,Freq_con,Base_con" << endl;
 	for (size_t i = 0; i < analyzer.reactions.size(); i++) {
 		outfile << analyzer.reactions[i] << ',' << analyzer.rp[i] << ',' << analyzer.sum_product_p[i]
 			<< ',' << analyzer.rm[i] << ',' << analyzer.sum_product_m[i] << endl;

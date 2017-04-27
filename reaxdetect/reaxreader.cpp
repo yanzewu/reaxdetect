@@ -16,18 +16,23 @@ int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 	InitBuffer(simulation.atomNumber + 1);
 	TrajReader::Frame _frame;
 	size_t i = 0;
+	size_t buffer_i = 0;
 	while (reader.ReadTrjFrame(_frame)) {
-		FrameStat fstat;
-		RecognizeMolecule(_frame, reader.atomWeights, simulation.atomNumber, fstat);
-		RecognizeReaction(_frame);
-		fss.push_back(fstat);
-		if (i >= config.buffer_size - 1) {
-			CommitReaction(fss[i - config.buffer_size + 1]);
+		if (i % config.recognize_interval == 0) {
+			FrameStat fstat;
+			fstat.t = simulation.timeStep * i;
+			RecognizeMolecule(_frame, reader.atomWeights, simulation.atomNumber, fstat);
+			RecognizeReaction(_frame);
+			fss.push_back(fstat);
+			if (buffer_i >= config.buffer_size - 1) {
+				CommitReaction(fss[buffer_i - config.buffer_size + 1]);
+			}
+			SwapBuffer();
+			buffer_i++;
 		}
-		SwapBuffer();
 		i++;
 	}
-	for (size_t j = i - config.buffer_size + 1; j < i; j++) {
+	for (size_t j = buffer_i - config.buffer_size + 1; j < buffer_i; j++) {
 		CommitReaction(fss[j]);
 	}
 

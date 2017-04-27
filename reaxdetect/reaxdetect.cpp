@@ -71,6 +71,7 @@ void ReaxDetect::translate_opt()
 	config_traj.read_atompos = stob(cfg_reader.get("ReadAtomPos", "false"));
 
 	config_reax.buffer_size = stoul(cfg_reader.get("FrameBufferSize", "4"));
+	config_reax.recognize_interval = stod(cfg_reader.get("RecognizeInterval", "1"));
 
 	config_analyzer = ReaxAnalyzer::Config();
 	config_analyzer.confidence = stod(cfg_reader.get("RateConstantConfidence", "0.95"));
@@ -107,10 +108,7 @@ int ReaxDetect::exec() {
 	default:
 		return 1;
 	}
-	if (write_option.write_fulldata && writer.Dump(input_name + "_full_dump.csv", input_name + "_full_reac.csv", reader, simulation.timeStep)) {
-		error(ERROR_BAD_OUTPUT);
-	}
-	if (write_option.write_rawdata && writer.WriteData(input_name + ".rwdx", reader, simulation)) {
+	if (write_option.write_fulldata && writer.Dump(input_name + "_full_dump.csv", input_name + "_full_reac.csv", reader)) {
 		error(ERROR_BAD_OUTPUT);
 	}
 	if (write_option.write_kineticfile) {
@@ -119,9 +117,6 @@ int ReaxDetect::exec() {
 		analyzer.HandleData(reader, simulation);
 		writer.WriteReport(input_name + "_report.csv", analyzer);
 		writer.WriteRawReactionFreq(input_name + "_rawfreq.csv", analyzer);
-		if (writer.WriteKineticFile(input_name + ".rkd", analyzer)) {
-			error(ERROR_BAD_OUTPUT);
-		}
 		if (writer.WriteSample(input_name + "_sample.csv", analyzer)) {
 			error(ERROR_BAD_OUTPUT);
 		}
@@ -162,7 +157,7 @@ int ReaxDetect::read_opt(int argc, char** argv) {
 		{ "", 0, 0, 0}
 	};
 	int longIndex;
-	int opt = getopt_long(argc, argv, "c:v:s:b:h", longOpts, &longIndex);
+	int opt = getopt_long(argc, argv, "c:v:s:b:f:h", longOpts, &longIndex);
 	while (opt != -1) {
 		switch (opt)
 		{
@@ -180,12 +175,16 @@ int ReaxDetect::read_opt(int argc, char** argv) {
 		case 'b':
 			cfg_reader["FrameBufferSize"] = string(optarg);
 			break;
+		case 'f':
+			cfg_reader["RecognizeInterval"] = string(optarg);
+			break;
 		case 'v':
 			simulation.volume = atof(optarg);
 			break;
 		case 's':
 			cfg_reader["SampleInterval"] = string(optarg);
 			cfg_reader["SampleRange"] = string(optarg);
+			break;
 		case '?':
 		case 'h':
 			display_help();
@@ -209,7 +208,7 @@ int ReaxDetect::read_opt(int argc, char** argv) {
 		default:
 			break;
 		}
-		opt = getopt_long(argc, argv, "c:v:s:b:h", longOpts, &longIndex);
+		opt = getopt_long(argc, argv, "c:v:s:b:f:h", longOpts, &longIndex);
 	}
 	input_path = string(argv[argc - 1]);
 	return 0;
@@ -223,7 +222,8 @@ void ReaxDetect::set_default_opt()
 	cfg_reader["SampleRange"] = "1000";
 	cfg_reader["RateConstantConfidence"] = "0.95";
 	cfg_reader["ReadAtomPos"] = "false";
-	cfg_reader["FrameBufferSize"] = "4";
+	cfg_reader["FrameBufferSize"] = "2";
+	cfg_reader["RecognizeInterval"] = "1";
 }
 
 void ReaxDetect::display_version() {

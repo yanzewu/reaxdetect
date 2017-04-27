@@ -1,7 +1,7 @@
 CC = icc
 CC_FLAGS = -O2 -std=c++14
 EXEC = reaxdetect-dev
-SOURCES = $(*.cpp)
+SOURCES = $(wildcard *.cpp)
 OBJECTS = $(SOURCES:.cpp=.o)
 
 $(EXEC): $(OBJECTS)

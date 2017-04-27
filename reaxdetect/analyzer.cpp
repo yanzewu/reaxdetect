@@ -9,17 +9,24 @@ void ReaxAnalyzer::HandleData(const ReaxReader& reader, const Simulation& simula
 		elements.push_back(WeightNameL.at((int)(e + 0.1)));
 	}
 
+	for (int i = 0; i < reader.species.size(); i++) {
+		if (reader.fss[0].mol_freq[i] == 0)break;
+		init[reader.species[i]] = reader.fss[0].mol_freq[i];
+	}
+
 	species = reader.species;
 	reactions.resize(reader.reactions.size());
 	for (size_t i = 0; i < reader.reactions.size(); i++) {
 		reactions[i] = reader.reactions[i].to_string(species);
 	}
 	
+	double interval = simulation.timeStep * (reader.fss[1].t - reader.fss[0].t);
+
 	CalcMolLife(reader, simulation.timeStep);
-	CalculateRateConstant(reader, simulation.timeStep, simulation.volume, get_confidence(config.confidence), config.collide_prob);
+	CalculateRateConstant(reader, interval, simulation.volume, get_confidence(config.confidence), config.collide_prob);
 
 	if (config.sample_method == SAMPLE_FIXINT) {
-		FixSample(reader, config.sample_int, config.sample_range, simulation.timeStep, simulation.volume);
+		FixSample(reader, config.sample_int, config.sample_range, interval, simulation.volume);
 	}
 }
 
@@ -100,40 +107,6 @@ void ReaxAnalyzer::CalculateRateConstant(const ReaxReader& rs, double timeStep, 
 				product *= (double)(fs - 1)->mol_freq[s];
 			sum_product_m[i] += product;
 
-		}
-	}
-
-	kp.resize(rsize);
-	km.resize(rsize);
-	for (size_t i = 0; i < 2; i++) {
-		kp_range[i].resize(rsize);
-		km_range[i].resize(rsize);
-	}
-
-	for (size_t i = 0; i < rsize; i++) {
-
-		double n = sum_product_p[i];
-		double kp_raw = (double)rp[i] / sum_product_p[i];
-		double km_raw = (double)rm[i] / sum_product_m[i];
-		double x1 = kp_raw + z*z / (2.0*n);
-		double x2 = z * sqrt(kp_raw * (1 - kp_raw) / n + z*z / (4.0 * n*n));
-
-		kp_range[0][i] = (x1 - x2) / (1.0 + z*z / n);
-		kp_range[1][i] = (x1 + x2) / (1.0 + z*z / n);
-
-		n = sum_product_m[i];
-		x1 = km_raw + z*z / (2.0*n);
-		x2 = z * sqrt(km_raw * (1 - km_raw) / n + z*z / (4.0 * n*n));
-		km_range[0][i] = (x1 - x2) / (1.0 + z*z / n);
-		km_range[1][i] = (x1 + x2) / (1.0 + z*z / n);
-
-		double kp_coeff = pow(volume, rs.reactions[i].reagants.size() - 1) / timeStep;
-		double km_coeff = pow(volume, rs.reactions[i].products.size() - 1) / timeStep;
-		kp[i] = kp_raw * kp_coeff;
-		km[i] = km_raw * km_coeff;
-		for (size_t j = 0; j < 2; j++) {
-			kp_range[j][i] *= kp_coeff;
-			km_range[j][i] *= km_coeff;
 		}
 	}
 }

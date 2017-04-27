@@ -20,12 +20,14 @@ public:
 
 	struct Config {
 		size_t buffer_size;
+		int recognize_interval;
 		Config() : buffer_size(2) {
 		}
 	};
 
 	//Frequecy of molecules and reactions in a frame
 	struct FrameStat {
+		double t;	// time stamp
 		Array mol_freq;
 		vector<diint> reaction_freq;
 	};
