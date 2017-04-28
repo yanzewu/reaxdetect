@@ -21,6 +21,7 @@ public:
 	struct Config {
 		size_t buffer_size;
 		int recognize_interval;
+		vector<int> skip_atomweight;
 		Config() : buffer_size(2) {
 		}
 	};
@@ -138,6 +139,10 @@ protected:
 	//test if an atom is terminal hydrogen
 	static bool isterminalhydrogen(int tmpscore);
 
+	/*feature*/
+
+	void _skip_bond(Matrix*);
+	Mark skip_atoms;
 };
 
 #endif // !REACTIONSTAT_H

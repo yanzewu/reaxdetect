@@ -12,6 +12,7 @@
 #include "analyzer.h"
 #include "datawriter.h"
 #include "filenamehandler.h"
+#include "stringconvert.h"
 
 #define ERROR_NO_INPUT	0x01
 #define ERROR_BAD_INPUT 0x02
@@ -71,7 +72,9 @@ void ReaxDetect::translate_opt()
 	config_traj.read_atompos = stob(cfg_reader.get("ReadAtomPos", "false"));
 
 	config_reax.buffer_size = stoul(cfg_reader.get("FrameBufferSize", "4"));
-	config_reax.recognize_interval = stod(cfg_reader.get("RecognizeInterval", "1"));
+	config_reax.recognize_interval = stoi(cfg_reader.get("RecognizeInterval", "1"));
+	auto skip_atoms = split(cfg_reader.get("SkipAtomWeight", "-1"), -1, ',');
+	for (const auto& skip_atom : skip_atoms)config_reax.skip_atomweight.push_back(stoi(skip_atom));
 
 	config_analyzer = ReaxAnalyzer::Config();
 	config_analyzer.confidence = stod(cfg_reader.get("RateConstantConfidence", "0.95"));
@@ -224,6 +227,7 @@ void ReaxDetect::set_default_opt()
 	cfg_reader["ReadAtomPos"] = "false";
 	cfg_reader["FrameBufferSize"] = "2";
 	cfg_reader["RecognizeInterval"] = "1";
+	cfg_reader["SkipAtomWeight"] = "-1";
 }
 
 void ReaxDetect::display_version() {

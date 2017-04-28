@@ -14,6 +14,14 @@ int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 	_buffer_pages = new BufferPage[config.buffer_size];
 
 	InitBuffer(simulation.atomNumber + 1);
+	skip_atoms = new bool[simulation.atomNumber + 1]{ false };
+	for (size_t i = 1; i < reader.atomWeights.size(); i++) {
+		if (find(config.skip_atomweight.begin(), config.skip_atomweight.end(), (int)(reader.atomWeights[i] + 0.1)) !=
+			config.skip_atomweight.end()) {
+			skip_atoms[i] = true;
+		}
+	}
+
 	TrajReader::Frame _frame;
 	size_t i = 0;
 	size_t buffer_i = 0;
@@ -40,6 +48,8 @@ int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 		species.push_back(mol.to_smiles());
 	}
 
+	printf("Smiles String Succeed\n");
+
 	//alignment
 	for (auto& fs : fss) {
 		fs.mol_freq.resize(molecules.size());
@@ -47,6 +57,7 @@ int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 	}
 
 	delete[] _buffer_pages;
+	delete[] skip_atoms;
 
 #ifdef _DEBUG
 	Check();
@@ -92,6 +103,9 @@ void ReaxReader::RecognizeMolecule(const TrajReader::Frame& frm, const Arrayd& a
 		_crt_buffer->bond_matrix[bnd.id_1].push_back(bnd.id_2); 
 		_crt_buffer->bond_matrix[bnd.id_2].push_back(bnd.id_1);
 	}
+
+	_skip_bond(&_crt_buffer->bond_matrix);
+
 	//1.first scan(DFS): get score, root, and mol of atoms: O(N)
 	Array molRoots;//root of molecules
 	Mark marks = new bool[atomNumber + 1]{ false };
@@ -101,6 +115,7 @@ void ReaxReader::RecognizeMolecule(const TrajReader::Frame& frm, const Arrayd& a
 		molRoots.push_back(i);
 		scan_score(i, atomWeights, _crt_buffer, marks, molRoots);
 	}
+
 	//2.sort bondmatrix: O(N*k^2)
 	for (auto bonds = _crt_buffer->bond_matrix.begin() + 1; bonds != _crt_buffer->bond_matrix.end(); bonds++) {
 		sortby(*bonds, _crt_buffer->atom_score, greater<int>());
@@ -141,6 +156,7 @@ void ReaxReader::RecognizeMolecule(const TrajReader::Frame& frm, const Arrayd& a
 			uindex[i] = molecules.size() - 1;
 		}
 	}
+
 	//6.restore uindex to index: O(N)
 	for (auto& molindex : _crt_buffer->mol_idx) {
 		molindex = uindex[molindex];

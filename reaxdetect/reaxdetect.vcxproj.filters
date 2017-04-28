@@ -101,6 +101,9 @@
     <ClCompile Include="filenamehandler.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="reaxreader_misc.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="update.txt">

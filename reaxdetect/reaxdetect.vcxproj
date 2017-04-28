@@ -142,6 +142,7 @@
   <ItemGroup>
     <ClCompile Include="datawriter.cpp" />
     <ClCompile Include="filenamehandler.cpp" />
+    <ClCompile Include="reaxreader_misc.cpp" />
     <ClCompile Include="stringconvert.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="reaxreader_mol.cpp" />
