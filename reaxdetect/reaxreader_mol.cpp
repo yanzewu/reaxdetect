@@ -1,14 +1,15 @@
 #include "reaxreader.h"
 #include "listhandler.h"
 
-int ReaxReader::totmpscore(int weight, int nhcon, int terminalh) {
-	return (weight * maxnhcon + nhcon) * maxhnum + terminalh;
+int ReaxReader::totmpscore(int weight, int nhcon, int bond, int terminalh) {
+	return ((weight * maxnhcon + nhcon) * maxbond + bond) * maxhnum + terminalh;
 }
 int ReaxReader::tmpscore2score(int tmpscore) {
-	return tmpscore % maxhnum + ((tmpscore / maxhnum) % maxnhcon * maxatmwht + (tmpscore / maxhnum) / maxnhcon) * maxhnum;
+	return tmpscore % (maxhnum * maxbond)+ 
+		((tmpscore / (maxhnum * maxbond)) % maxnhcon * maxatmwht + (tmpscore / (maxhnum * maxbond)) / maxnhcon) * maxbond * maxhnum;
 }
 bool ReaxReader::isterminalhydrogen(int tmpscore) {
-	return tmpscore == (maxnhcon + 1) * maxhnum;
+	return tmpscore == ((maxnhcon + 1) * maxbond + 1) * maxhnum;
 }
 
 void ReaxReader::MatMolecule::push_back(int index) {
@@ -16,6 +17,8 @@ void ReaxReader::MatMolecule::push_back(int index) {
 }
 
 bool ReaxReader::MatMolecule::operator==(const MatMolecule& othermlc)const {
+	if (atoms.size() != othermlc.atoms.size())return false;
+	
 	auto atom1 = atoms.begin();
 	
 	auto atom2 = othermlc.atoms.begin();
@@ -37,12 +40,12 @@ smiles ReaxReader::MatMolecule::to_smiles()const {
 	tsize_t i = 0;
 	Array atomrpos(pbondmatrix->size(), -2);
 	for (const auto& atom : atoms) {
-		if (isterminalhydrogen((*pscores)[atom])) {
+		if (isterminalhydrogen((*pscores)[atom]) && (*pbondmatrix)[atom].front().second != 0) {
 			atomrpos[atom] = -1;
 			continue;//no terminal hydrogen
 		}
-		else if ((*pscores)[atom] == maxnhcon * maxhnum + 1) {	// (X-)H-H
-			if (atomrpos[(*pbondmatrix)[atom].front()] == -2) {
+		else if ((*pscores)[atom] == (maxnhcon * maxbond + 1) * maxhnum + 1) {	// (X-)H-H
+			if (atomrpos[(*pbondmatrix)[atom].front().first] == -2) {
 				atomrpos[atom] = -1;
 				continue;
 			}
@@ -56,7 +59,7 @@ smiles ReaxReader::MatMolecule::to_smiles()const {
 	for (const auto& atom : atoms) {
 		if (atomrpos[atom] < 0)continue;
 		for (const auto& child : (*pbondmatrix)[atom]) {
-			if (atomrpos[child] >= 0)sms._push_child(i, atomrpos[child]);
+			if (atomrpos[child.first] >= 0)sms._push_child(i, atomrpos[child.first], child.second);
 		}
 		i++;
 	}

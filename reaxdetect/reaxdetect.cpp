@@ -51,11 +51,6 @@ int ReaxDetect::init(int argc, char** argv) {
 	if (input_path_split[2] == "trj") {
 		file_type = ReaxDetect::TRAJECTORY_FILE;
 	}
-	else if (input_path_split[2] == "rwdx") {
-		file_type = ReaxDetect::RAWDATA_FILE;
-		if (write_option.write_fulldata == 1)write_option.write_fulldata = 0;
-		if (write_option.write_rawdata == 1)write_option.write_rawdata = 0;
-	}
 	else {
 		error(ERROR_BAD_INPUT);
 	}
@@ -68,10 +63,11 @@ void ReaxDetect::translate_opt()
 {
 	config_traj = TrajReader::Config();
 	config_traj.bondorder_cutoff = stod(cfg_reader.get("BondOrderCutoff", "0.5"));
+	config_traj.bondorder_cutoff_lo = stod(cfg_reader.get("BondOrderCutoffLow", "0.3"));
 	config_traj.read_atompos = stob(cfg_reader.get("ReadAtomPos", "false"));
 
-	config_reax.buffer_size = stoul(cfg_reader.get("FrameBufferSize", "4"));
-	config_reax.recognize_interval = stod(cfg_reader.get("RecognizeInterval", "1"));
+	config_reax.buffer_size = stoul(cfg_reader.get("FrameBufferSize", "2"));
+	config_reax.recognize_interval = stoi(cfg_reader.get("RecognizeInterval", "1"));
 
 	config_analyzer = ReaxAnalyzer::Config();
 	config_analyzer.confidence = stod(cfg_reader.get("RateConstantConfidence", "0.95"));
@@ -100,11 +96,6 @@ int ReaxDetect::exec() {
 			reader.HandleData(traj, simulation);
 		}
 		break;
-	case ReaxDetect::RAWDATA_FILE:
-		if (writer.ReadData(input_path, reader, &simulation)) {
-			error(ERROR_BAD_INPUT);
-		}
-		break;
 	default:
 		return 1;
 	}
@@ -115,7 +106,7 @@ int ReaxDetect::exec() {
 		printf("Analysing Kinetic Results...\n");
 		ReaxAnalyzer analyzer(config_analyzer);
 		analyzer.HandleData(reader, simulation);
-		writer.WriteReport(input_name + "_report.csv", analyzer);
+		writer.WriteReport(input_name + "_full_report.csv", analyzer);
 		writer.WriteRawReactionFreq(input_name + "_rawfreq.csv", analyzer);
 		if (writer.WriteSample(input_name + "_sample.csv", analyzer)) {
 			error(ERROR_BAD_OUTPUT);
@@ -153,6 +144,7 @@ int ReaxDetect::read_opt(int argc, char** argv) {
 	const option longOpts[] = {
 		{ "version", no_argument, NULL, 0 },
 		{ "help", no_argument, NULL, 'h' },
+		{ "config", no_argument, NULL, 0},
 		{ "dump", required_argument, NULL, 0},
 		{ "", 0, 0, 0}
 	};
@@ -204,6 +196,10 @@ int ReaxDetect::read_opt(int argc, char** argv) {
 					write_option.write_rawdata = 2;
 				}
 			}
+			else if (string(longOpts[longIndex].name) == "config") {
+				cfg_reader.read_data(path::split(argv[0])[0] + default_config_path);
+				return ERROR_NO_EXEC;
+			}
 			break;
 		default:
 			break;
@@ -217,6 +213,7 @@ int ReaxDetect::read_opt(int argc, char** argv) {
 void ReaxDetect::set_default_opt()
 {
 	cfg_reader["BondOrderCutoff"] = "0.5";
+	cfg_reader["BondOrderCutoffLow"] = "0.3";
 	cfg_reader["SampleMethod"] = "fix_int";
 	cfg_reader["SampleInterval"] = "1000";
 	cfg_reader["SampleRange"] = "1000";
@@ -232,5 +229,5 @@ void ReaxDetect::display_version() {
 void ReaxDetect::display_help() {
 	printf("Reaction Detector:\n");
 	printf("reaxdetect [-v volume] [-s samplerange] [-b buffersize] [-c config] [-h help] input_file\n");
-	printf("--version, --help, --dump [dumpoption=nodump/full]\n");
+	printf("--version, --help, --dump [dumpoption=nodump/full] --config\n");
 }

@@ -15,7 +15,7 @@
 class ReaxReader {
 public:
 
-	typedef vector<list<int> > Matrix;
+	typedef vector<list<pair<int, int> > > Matrix;
 	typedef bool* Mark;
 
 	struct Config {
@@ -130,7 +130,7 @@ protected:
 		Reaction & reaction_2, BufferPage* buffer_2_prod, BufferPage* buffer_2_reac);
 
 	//generate score to raw score
-	static int totmpscore(int weight, int nhcon, int terminalh);
+	static int totmpscore(int weight, int nhcon, int bond, int terminalh);
 
 	//make tmp score to smiles score
 	static int tmpscore2score(int tmpscore);

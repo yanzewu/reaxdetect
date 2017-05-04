@@ -13,8 +13,9 @@ public:
 
 	struct Config {
 		double bondorder_cutoff;
+		double bondorder_cutoff_lo;
 		int read_atompos;
-		Config() : bondorder_cutoff(0.5), read_atompos(0) {
+		Config() : bondorder_cutoff_lo(0.3), bondorder_cutoff(0.5), read_atompos(0) {
 		}
 	};
 
@@ -25,8 +26,9 @@ public:
 
 	struct bond{
 		int id_1, id_2;
-		bond() {}
-		bond(int a, int b) : id_1(a), id_2(b) {
+		int order;
+		bond() : order(0) {}
+		bond(int a, int b) : id_1(a), id_2(b), order(1) {
 		}
 	};
 

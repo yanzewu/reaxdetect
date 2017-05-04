@@ -52,7 +52,7 @@ bool contain_equal(list<type>& c1, list<type>& c2, order_sort pred_sort, order_e
 
 //sort a index list by score. Pred means the order of head to tail.
 template<typename type, typename order>
-void sortby(list<type>& source, const Array& score, order pred) {
+inline void sortby(list<type>& source, const Array& score, order pred) {
 	if (source.empty())return;
 
 	auto _pred = [score, pred](auto x, auto y) {
@@ -61,9 +61,19 @@ void sortby(list<type>& source, const Array& score, order pred) {
 	source.sort(_pred);
 }
 
+template<typename type, typename order>
+inline void sortby_pair(list<pair<type, type> >& source, const Array& score, order pred) {
+	if (source.empty())return;
+
+	auto _pred = [score, pred](auto x, auto y) {
+		return pred(score[x.first], score[y.first]);
+	};
+	source.sort(_pred);
+}
+
 //sort a index list by score. Pred means the order of head to tail.
 template<typename container, typename order>
-void sortby(container& source, const Array& score, order pred) {
+inline void sortby(container& source, const Array& score, order pred) {
 	if (source.empty())return;
 
 	auto _pred = [score, pred](auto x, auto y) {
@@ -74,7 +84,7 @@ void sortby(container& source, const Array& score, order pred) {
 
 //rank by a exist rank
 template<typename iter>
-void sortwithrank(iter begin, iter end, Array& rank) {
+inline void sortwithrank(iter begin, iter end, Array& rank) {
 	if (end == begin || end == begin + 1)return;
 	unsigned int i = 0;
 	for (iter s = begin; s != end; s++) {
@@ -90,7 +100,7 @@ void sortwithrank(iter begin, iter end, Array& rank) {
 
 //sort a list with another list accompanied. Pred means the order of head to tail.
 template<typename type1, typename type2, typename order>
-void sortwith(vector<type1>& score, vector<type2>& assist, const order pred) {
+inline void sortwith(vector<type1>& score, vector<type2>& assist, const order pred) {
 	for (size_t i = 0; i < score.size() - 1; i++) {
 		for (size_t j = 0; j < score.size() - 1 - i; j++) {
 			if (pred(score[j + 1], score[j])) {

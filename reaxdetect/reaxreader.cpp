@@ -89,8 +89,8 @@ void ReaxReader::SwapBuffer() {
 void ReaxReader::RecognizeMolecule(const TrajReader::Frame& frm, const Arrayd& atomWeights, int atomNumber, FrameStat& fs)
 {
 	for (const auto& bnd : frm.bonds) {
-		_crt_buffer->bond_matrix[bnd.id_1].push_back(bnd.id_2); 
-		_crt_buffer->bond_matrix[bnd.id_2].push_back(bnd.id_1);
+		_crt_buffer->bond_matrix[bnd.id_1].push_back({ bnd.id_2, bnd.order });
+		_crt_buffer->bond_matrix[bnd.id_2].push_back({ bnd.id_1, bnd.order });
 	}
 	//1.first scan(DFS): get score, root, and mol of atoms: O(N)
 	Array molRoots;//root of molecules
@@ -103,7 +103,7 @@ void ReaxReader::RecognizeMolecule(const TrajReader::Frame& frm, const Arrayd& a
 	}
 	//2.sort bondmatrix: O(N*k^2)
 	for (auto bonds = _crt_buffer->bond_matrix.begin() + 1; bonds != _crt_buffer->bond_matrix.end(); bonds++) {
-		sortby(*bonds, _crt_buffer->atom_score, greater<int>());
+		sortby_pair(*bonds, _crt_buffer->atom_score, greater<int>());
 	}
 	memset(marks, 0, sizeof(bool)*(atomNumber + 1));
 
@@ -258,11 +258,13 @@ void ReaxReader::scan_score(int index, const Arrayd& atomweight, BufferPage* buf
 	buffer->mol_of_atom[index] = mol_roots.size() - 1;
 	int weight = (int)(atomweight[index] + 0.1);
 	int nhcon = 0;
+	int bondcon = 0;
 	for (const auto& child : buffer->bond_matrix[index]) {
-		if (atomweight[child] >= 2 || buffer->bond_matrix[child].size() > 1)nhcon++;//not terminal H
-		if (!marks[child])scan_score(child, atomweight, buffer, marks, mol_roots);
+		bondcon += child.second;
+		if (child.second == 0 || atomweight[child.first] >= 2 || buffer->bond_matrix[child.first].size() > 1)nhcon++;//not terminal H
+		if (!marks[child.first])scan_score(child.first, atomweight, buffer, marks, mol_roots);
 	}
-	buffer->atom_score[index] = totmpscore(weight, nhcon, buffer->bond_matrix[index].size() - nhcon);
+	buffer->atom_score[index] = totmpscore(weight, nhcon, bondcon, buffer->bond_matrix[index].size() - nhcon);
 	if (buffer->atom_score[index] > buffer->atom_score[mol_roots.back()])mol_roots.back() = index;
 }
 
@@ -270,7 +272,7 @@ void ReaxReader::scan_molecule(int index, BufferPage* buffer, Mark marks, MatMol
 	marks[index] = true;
 	molecule.push_back(index);
 	for (const auto& child : buffer->bond_matrix[index]) {
-		if (!marks[child])scan_molecule(child, buffer, marks, molecule);
+		if (!marks[child.first])scan_molecule(child.first, buffer, marks, molecule);
 	}
 }
 

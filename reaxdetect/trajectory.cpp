@@ -4,6 +4,15 @@
 #define DATA_LENGTH	24
 #define LINE_LENGTH	62
 
+inline int approx(double d) {
+	if (d - (int)d > 0.5) {
+		return (int)d + 1;
+	}
+	else {
+		return (int)d;
+	}
+}
+
 int TrajReader::Open(const string& filename) {
 	trjfile.open(filename, ios_base::in);
 	if (!trjfile.is_open()) {
@@ -83,7 +92,12 @@ int TrajReader::ReadTrjFrame(Frame& frameOut) {
 	for (int i = 0; i < bondNumber; i++) {
 		bond crtBond; double length, order;
 		trjfile >> crtBond.id_1 >> crtBond.id_2 >> length >> order;
-		if (order > config.bondorder_cutoff)frameOut.bonds.push_back(crtBond);
+		if (order > config.bondorder_cutoff_lo) {
+			if (order > config.bondorder_cutoff) {
+				crtBond.order = 1;// approx(order);
+			}
+			frameOut.bonds.push_back(crtBond);
+		}
 	}
 	return 1;
 }
