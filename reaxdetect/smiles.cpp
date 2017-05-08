@@ -22,7 +22,10 @@ inline bool isShort(const char name) {
 
 // compatibility for old stl
 inline string _to_string(int i) {
-	return std::to_string(static_cast<long long>(i));
+	if (i < 10)
+		return std::to_string(static_cast<long long>(i));
+	else
+		return "%" + std::to_string(static_cast<long long>(i));
 }
 
 int smiles::to_score(int weight, int hydrogen, int connection) {
