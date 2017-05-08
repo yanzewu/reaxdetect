@@ -23,7 +23,7 @@ void ReaxAnalyzer::HandleData(const ReaxReader& reader, const Simulation& simula
 	double interval = simulation.timeStep * (reader.fss[1].t - reader.fss[0].t);
 
 	CalcMolLife(reader, simulation.timeStep);
-	CalculateRateConstant(reader, interval, simulation.volume, get_confidence(config.confidence), config.collide_prob);
+	CountReaction(reader);
 
 	if (config.sample_method == SAMPLE_FIXINT) {
 		FixSample(reader, config.sample_int, config.sample_range, interval, simulation.volume);
@@ -73,17 +73,7 @@ void ReaxAnalyzer::CalcMolLife(const ReaxReader& rs, double timeStep)
 	}
 }
 
-double ReaxAnalyzer::get_confidence(double confidence) {
-	if (confidence == 0.90) return 1.645;
-	else if (confidence == 0.95)return 1.96;
-	else if (confidence == 0.99)return 2.576;
-	else {
-		printf("Warning: Confidence not valid. Using 95%% confidence.\n");
-		return 1.96;
-	}
-}
-
-void ReaxAnalyzer::CalculateRateConstant(const ReaxReader& rs, double timeStep, double volume, double z, double collideRatio)
+void ReaxAnalyzer::CountReaction(const ReaxReader& rs)
 {
 	//version 2: confidence interval.
 	using namespace veccal;

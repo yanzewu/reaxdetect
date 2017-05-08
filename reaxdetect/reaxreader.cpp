@@ -35,7 +35,7 @@ int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 	for (size_t j = buffer_i - config.buffer_size + 1; j < buffer_i; j++) {
 		CommitReaction(fss[j]);
 	}
-
+	printf("Encoding smiles...\n");
 	for (auto& mol : molecules) {
 		species.push_back(mol.to_smiles());
 	}

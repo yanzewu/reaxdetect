@@ -32,12 +32,10 @@ public:
 	vector<unsigned int> sum_product_p, sum_product_m;
 
 	struct Config {
-		double confidence;
-		double collide_prob;
 		char sample_method;
 		tsize_t sample_int;
 		tsize_t sample_range;
-		Config() : confidence(0.90), collide_prob(1.0), sample_method(SAMPLE_FIXINT) {
+		Config() : sample_method(SAMPLE_FIXINT) {
 		}
 	};
 
@@ -52,10 +50,8 @@ public:
 private:
 
 	void CalcMolLife(const ReaxReader& rs, double timeStep);
-	void CalculateRateConstant(const ReaxReader& rs, double timeStep, double volume, double confidence, double collideRatio);
+	void CountReaction(const ReaxReader& rs);
 	void FixSample(const ReaxReader&, tsize_t sample_int, tsize_t range, double interval, double volume);
-
-	static double get_confidence(double confidence);
 
 	Config config;
 };

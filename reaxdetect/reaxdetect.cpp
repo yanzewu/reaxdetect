@@ -48,13 +48,6 @@ int ReaxDetect::init(int argc, char** argv) {
 
 	vector<string> input_path_split = path::split(input_path);
 	input_name = input_path_split[0] + input_path_split[1];
-	if (input_path_split[2] == "trj") {
-		file_type = ReaxDetect::TRAJECTORY_FILE;
-	}
-	else {
-		error(ERROR_BAD_INPUT);
-	}
-
 	translate_opt();
 	return 0;
 }
@@ -70,7 +63,6 @@ void ReaxDetect::translate_opt()
 	config_reax.recognize_interval = stoi(cfg_reader.get("RecognizeInterval", "1"));
 
 	config_analyzer = ReaxAnalyzer::Config();
-	config_analyzer.confidence = stod(cfg_reader.get("RateConstantConfidence", "0.95"));
 	string sample_method_str = cfg_reader.get("SampleMethod", "fixint");
 	if (sample_method_str == "fixint") {
 		config_analyzer.sample_method = SAMPLE_FIXINT;
@@ -81,24 +73,19 @@ void ReaxDetect::translate_opt()
 
 int ReaxDetect::exec() {
 
-	printf("Reading File...\n");
+	printf("Reading Trajectory File...\n");
 	ReaxDataWriter writer;
 	ReaxReader reader(config_reax);
 
-	switch (file_type)
-	{
-	case ReaxDetect::TRAJECTORY_FILE:{
-			TrajReader traj(config_traj);
-			if (traj.Open(input_path) || traj.ReadTrjHead(&simulation)){
-				error(ERROR_BAD_INPUT);
-			}
-			printf("\n");
-			reader.HandleData(traj, simulation);
-		}
-		break;
-	default:
-		return 1;
+	TrajReader traj(config_traj);
+	if (traj.Open(input_path) || traj.ReadTrjHead(&simulation)){
+		error(ERROR_BAD_INPUT);
 	}
+	printf("Reading Frames...\n");
+	reader.HandleData(traj, simulation);
+	printf("Total %d frames read, with %d molecules and %d reactions.\n",
+		reader.fss.size(), reader.species.size(), reader.reactions.size());
+
 	if (write_option.write_fulldata && writer.Dump(input_name + "_full_dump.csv", input_name + "_full_reac.csv", reader)) {
 		error(ERROR_BAD_OUTPUT);
 	}
