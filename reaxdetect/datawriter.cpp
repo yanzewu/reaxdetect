@@ -206,9 +206,9 @@ int ReaxDataWriter::WriteReport(const string & path, const ReaxAnalyzer & analyz
 		outfile << i << "," << analyzer.species[i] << "," << analyzer.species_life[i] << endl;
 	}
 	outfile << "Reactions\n";
-	outfile << "index,\treaction,\tfreqplus,\tfreqminus,\tkp_real,km_real,\tkp_min,kp_max,\tkm_min,km_max\n";
+	outfile << "index,\treaction,\tfreqplus,\tfreqminus\n";
 	for (size_t i = 0; i < analyzer.reactions.size(); i++) {
-		outfile << i << "," << analyzer.reactions[i] << "," << analyzer.rp[i] << "," << analyzer.rm[i] << ",";
+		outfile << i << "," << analyzer.reactions[i] << "," << analyzer.rp[i] << "," << analyzer.rm[i] << "\n";
 	}
 
 	outfile.close();

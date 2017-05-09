@@ -71,7 +71,7 @@ void ReaxDetect::translate_opt()
 	config_traj.bondorder_cutoff = stod(cfg_reader.get("BondOrderCutoff", "0.5"));
 	config_traj.read_atompos = stob(cfg_reader.get("ReadAtomPos", "false"));
 
-	config_reax.buffer_size = stoul(cfg_reader.get("FrameBufferSize", "4"));
+	config_reax.buffer_size = stoul(cfg_reader.get("FrameBufferSize", "2"));
 	config_reax.recognize_interval = stoi(cfg_reader.get("RecognizeInterval", "1"));
 	auto skip_atoms = split(cfg_reader.get("SkipAtomWeight", "-1"), -1, ',');
 	for (const auto& skip_atom : skip_atoms)config_reax.skip_atomweight.push_back(stoi(skip_atom));
@@ -232,6 +232,7 @@ void ReaxDetect::set_default_opt()
 
 void ReaxDetect::display_version() {
 	printf("Reaction Detector: Version %d.%d.%d\n", MYVERSION / 10000, (MYVERSION / 100) % 100, MYVERSION % 100);
+	printf("Skip atom version\n");
 }
 void ReaxDetect::display_help() {
 	printf("Reaction Detector:\n");

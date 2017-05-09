@@ -29,7 +29,7 @@ public:
 	Arrayd kp, km;
 	Arrayd kp_range[2], km_range[2];
 	Array rp, rm;
-	Array sum_product_p, sum_product_m;
+	vector<unsigned int> sum_product_p, sum_product_m;
 
 	struct Config {
 		double confidence;

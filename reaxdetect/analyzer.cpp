@@ -14,17 +14,23 @@ void ReaxAnalyzer::HandleData(const ReaxReader& reader, const Simulation& simula
 		init[reader.species[i]] = reader.fss[0].mol_freq[i];
 	}
 
+	printf("Encoding reactions...\n");
 	species = reader.species;
 	reactions.resize(reader.reactions.size());
 	for (size_t i = 0; i < reader.reactions.size(); i++) {
 		reactions[i] = reader.reactions[i].to_string(species);
 	}
 	
+	printf("Calculating molecule lifetime...\n");
+	CalcMolLife(reader, simulation.timeStep);
+
+	printf("Calculating kinetic data...\n");
 	double interval = simulation.timeStep * (reader.fss[1].t - reader.fss[0].t);
 
-	CalcMolLife(reader, simulation.timeStep);
+	printf("Interval: %f ps\n", interval);
 	CalculateRateConstant(reader, interval, simulation.volume, get_confidence(config.confidence), config.collide_prob);
 
+	printf("Sampling...\n");
 	if (config.sample_method == SAMPLE_FIXINT) {
 		FixSample(reader, config.sample_int, config.sample_range, interval, simulation.volume);
 	}
@@ -85,7 +91,6 @@ double ReaxAnalyzer::get_confidence(double confidence) {
 
 void ReaxAnalyzer::CalculateRateConstant(const ReaxReader& rs, double timeStep, double volume, double z, double collideRatio)
 {
-	//version 2: confidence interval.
 	using namespace veccal;
 
 	//get frequency distribution
