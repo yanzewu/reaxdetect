@@ -119,7 +119,8 @@ int ReaxDataWriter::WriteBondOrder(const string & path, const ReaxReader & reade
 {
 	ofstream outfile(path, ios_base::out);
 	for (const auto& entry : reader.bondorders) {
-		outfile << WeightName[int(simulation.atomWeights[entry.first / MAX_ATOM_TYPE] + 0.1)];
+		outfile << WeightName[entry.first / MAX_ATOM_TYPE] << '-';
+		outfile << WeightName[entry.first % MAX_ATOM_TYPE];
 		for (const auto& b : entry.second) {
 			outfile << ',' << b;
 		}

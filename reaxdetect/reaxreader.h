@@ -112,7 +112,7 @@ protected:
 	void CommitReaction(FrameStat& fs_commit);
 
 	//count bond order for different types
-	void CountBondOrder(const TrajReader::Frame& frm, const Array& atomTypes);
+	void CountBondOrder(const TrajReader::Frame& frm, const Arrayd& atomWeights);
 
 	//initialize buffer pages
 	void InitBuffer(size_t max_atom_idx);
