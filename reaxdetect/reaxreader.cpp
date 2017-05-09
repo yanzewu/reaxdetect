@@ -220,7 +220,7 @@ void ReaxReader::CountBondOrder(const TrajReader::Frame & frm, const Array & ato
 {
 	for (const auto& bond : frm.bonds) {
 		int type1 = atomTypes[bond.id_1], type2 = atomTypes[bond.id_2];
-		bondorders[type1 > type2 ? (type1 * MAX_ATOM_TYPE + type2) : (type2 * MAX_ATOM_TYPE + type1)].push_back(bond.order);
+		bondorders[type1 > type2 ? (type1 * MAX_ATOM_TYPE + type2) : (type2 * MAX_ATOM_TYPE + type1)].push_back(bond.raw_order);
 	}
 
 }

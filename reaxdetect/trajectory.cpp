@@ -93,10 +93,10 @@ int TrajReader::ReadTrjFrame(Frame& frameOut) {
 	trjfile >> bondNumber;
 	frameOut.bonds.clear();
 	for (int i = 0; i < bondNumber; i++) {
-		bond crtBond; double length, order;
-		trjfile >> crtBond.id_1 >> crtBond.id_2 >> length >> order;
-		if (order > config.bondorder_cutoff_lo) {
-			if (order > config.bondorder_cutoff) {
+		bond crtBond; double length;
+		trjfile >> crtBond.id_1 >> crtBond.id_2 >> length >> crtBond.raw_order;
+		if (crtBond.raw_order > config.bondorder_cutoff_lo) {
+			if (crtBond.raw_order > config.bondorder_cutoff) {
 				crtBond.order = 1;// approx(order);
 			}
 			frameOut.bonds.push_back(crtBond);

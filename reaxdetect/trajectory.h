@@ -27,6 +27,7 @@ public:
 	struct bond{
 		int id_1, id_2;
 		int order;
+		double raw_order;
 		bond() : order(0) {}
 		bond(int a, int b) : id_1(a), id_2(b), order(1) {
 		}
