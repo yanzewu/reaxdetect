@@ -11,6 +11,9 @@
 
 int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 {
+	printf("Buffer size=%d\n", config.buffer_size);
+	printf("Read interval=%d\n", config.recognize_interval);
+
 	_buffer_pages = new BufferPage[config.buffer_size];
 
 	InitBuffer(simulation.atomNumber + 1);
@@ -35,6 +38,8 @@ int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 	for (size_t j = buffer_i - config.buffer_size + 1; j < buffer_i; j++) {
 		CommitReaction(fss[j]);
 	}
+	printf("Total %d frames read, with %d molecules and %d reactions.\n", fss.size(), molecules.size(), reactions.size());
+
 	printf("Encoding smiles...\n");
 	for (auto& mol : molecules) {
 		species.push_back(mol.to_smiles());

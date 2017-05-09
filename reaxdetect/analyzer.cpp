@@ -8,25 +8,43 @@ void ReaxAnalyzer::HandleData(const ReaxReader& reader, const Simulation& simula
 	for (const auto& e : simulation.atomWeights) {
 		elements.push_back(WeightNameL.at((int)(e + 0.1)));
 	}
+	printf("Elements are:\n");
+	for (const auto& e : elements) {
+		printf(" %s", e.c_str());
+	}
 
 	for (int i = 0; i < reader.species.size(); i++) {
 		if (reader.fss[0].mol_freq[i] == 0)break;
 		init[reader.species[i]] = reader.fss[0].mol_freq[i];
 	}
 
+	printf("Concentration of reactants are:\n");
+	for (const auto& reactant : init) {
+		printf("%s\t%d\n", reactant.first.c_str(), reactant.second);
+	}
+
+	printf("Encoding reactions\n");
 	species = reader.species;
 	reactions.resize(reader.reactions.size());
 	for (size_t i = 0; i < reader.reactions.size(); i++) {
 		reactions[i] = reader.reactions[i].to_string(species);
 	}
-	
-	double interval = simulation.timeStep * (reader.fss[1].t - reader.fss[0].t);
 
+	printf("Calculating molecule lifetime...\n");
 	CalcMolLife(reader, simulation.timeStep);
+	
+	printf("Calculating reaction product...\n");
+	double interval = simulation.timeStep * (reader.fss[1].t - reader.fss[0].t);
+	printf("Interval: %.3e", interval);
 	CountReaction(reader);
 
+	printf("Sampling...\n");
 	if (config.sample_method == SAMPLE_FIXINT) {
+		printf("Using fixed sample with interval %d, range %d\n", config.sample_int, config.sample_range);
 		FixSample(reader, config.sample_int, config.sample_range, interval, simulation.volume);
+	}
+	else {
+		printf("Unknown sample method\n");
 	}
 }
 

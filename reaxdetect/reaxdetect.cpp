@@ -83,9 +83,8 @@ int ReaxDetect::exec() {
 	}
 	printf("Reading Frames...\n");
 	reader.HandleData(traj, simulation);
-	printf("Total %d frames read, with %d molecules and %d reactions.\n",
-		reader.fss.size(), reader.species.size(), reader.reactions.size());
 
+	printf("Writing raw results...\n");
 	if (write_option.write_fulldata && writer.Dump(input_name + "_full_dump.csv", input_name + "_full_reac.csv", reader)) {
 		error(ERROR_BAD_OUTPUT);
 	}

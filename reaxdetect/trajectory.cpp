@@ -36,6 +36,9 @@ int TrajReader::ReadTrjHead(Simulation* simulation) {
 	simulation->timeStep /= 1000.0;
 
 	printf("Name: %s\n", simulation->name);
+	printf("Atom numbers: %d\n", simulation->atomNumber);
+	printf("Time step: %.2e ps\n", simulation->timeStep);
+
 	trjfile.seekg(traj_length, ios_base::beg);
 	//read atom type
 	trjfile.seekg(2 * LINE_LENGTH, ios_base::cur);
