@@ -8,7 +8,7 @@ void ReaxAnalyzer::HandleData(const ReaxReader& reader, const Simulation& simula
 	for (const auto& e : simulation.atomWeights) {
 		elements.push_back(WeightNameL.at((int)(e + 0.1)));
 	}
-	printf("Elements are:\n");
+	printf("Elements are:");
 	for (const auto& e : elements) {
 		printf(" %s", e.c_str());
 	}
@@ -18,12 +18,12 @@ void ReaxAnalyzer::HandleData(const ReaxReader& reader, const Simulation& simula
 		init[reader.species[i]] = reader.fss[0].mol_freq[i];
 	}
 
-	printf("Concentration of reactants are:\n");
+	printf("\nConcentration of reactants are:\n");
 	for (const auto& reactant : init) {
 		printf("%s\t%d\n", reactant.first.c_str(), reactant.second);
 	}
 
-	printf("Encoding reactions\n");
+	printf("Encoding reactions...\n");
 	species = reader.species;
 	reactions.resize(reader.reactions.size());
 	for (size_t i = 0; i < reader.reactions.size(); i++) {
@@ -35,7 +35,7 @@ void ReaxAnalyzer::HandleData(const ReaxReader& reader, const Simulation& simula
 	
 	printf("Calculating reaction product...\n");
 	double interval = simulation.timeStep * (reader.fss[1].t - reader.fss[0].t);
-	printf("Interval: %.3e", interval);
+	printf("Interval: %.3e\n", interval);
 	CountReaction(reader);
 
 	printf("Sampling...\n");
