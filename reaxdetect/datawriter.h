@@ -9,11 +9,6 @@
 
 class ReaxDataWriter {
 public:
-	// read data from rwdx file
-	static int ReadData(const string&, ReaxReader&, Simulation*);
-
-	// write data into rwdx file
-	static int WriteData(const string&, const ReaxReader&, const Simulation&);
 
 	// dump full concentration
 	static int Dump(const string& species_path, const string& reac_path, const ReaxReader&);
@@ -26,6 +21,8 @@ public:
 	static int WriteKineticFile(const string& path, const ReaxAnalyzer&);
 
 	static int WriteRawReactionFreq(const string& path, const ReaxAnalyzer&);
+
+	static int WriteBondOrder(const string& path, const ReaxReader&, const Simulation&);
 };
 
 #endif // !DATAWRITER_H

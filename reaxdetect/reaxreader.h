@@ -8,6 +8,8 @@
 #include "trajectory.h"
 #include "smiles.h"
 
+#define MAX_ATOM_TYPE	256
+
 /* Append in 9/5/2016. Version 2.1.3 */
 
 //recording indices of reagants and products in a reaction
@@ -21,6 +23,7 @@ public:
 	struct Config {
 		size_t buffer_size;
 		int recognize_interval;
+		bool count_bondorder;
 		Config() : buffer_size(2) {
 		}
 	};
@@ -49,6 +52,7 @@ public:
 	};
 
 	vector<FrameStat> fss;			//Raw data. Do not use directly.
+	map<int, vector<double> > bondorders; // statistics of bond order
 	vector<smiles> molecules;		//Smiles of all molecules in the trajectory. Do not use directly.
 	vector<string> species;			// name of species
 	vector<Reaction> reactions;		//List of all different reactions
@@ -106,6 +110,9 @@ protected:
 	
 	//commit reaction into lists
 	void CommitReaction(FrameStat& fs_commit);
+
+	//count bond order for different types
+	void CountBondOrder(const TrajReader::Frame& frm, const Array& atomTypes);
 
 	//initialize buffer pages
 	void InitBuffer(size_t max_atom_idx);

@@ -5,6 +5,7 @@
 #include "filenamehandler.h"
 #include "numarray.h"
 #include "stringconvert.h"
+#include "elementname.h"
 
 #define FILENAME_LENGTH 37
 #define RWDXHEADER	"RAWDX2FF"
@@ -111,5 +112,20 @@ int ReaxDataWriter::WriteRawReactionFreq(const string & path, const ReaxAnalyzer
 			<< ',' << analyzer.rm[i] << ',' << analyzer.sum_product_m[i] << endl;
 	}
 	outfile.close();
+	return 0;
+}
+
+int ReaxDataWriter::WriteBondOrder(const string & path, const ReaxReader & reader, const Simulation& simulation)
+{
+	ofstream outfile(path, ios_base::out);
+	for (const auto& entry : reader.bondorders) {
+		outfile << WeightName[int(simulation.atomWeights[entry.first / MAX_ATOM_TYPE] + 0.1)];
+		for (const auto& b : entry.second) {
+			outfile << ',' << b;
+		}
+		outfile << endl;
+	}
+	outfile.close();
+
 	return 0;
 }

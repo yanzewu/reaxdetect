@@ -61,6 +61,7 @@ void ReaxDetect::translate_opt()
 
 	config_reax.buffer_size = stoul(cfg_reader.get("FrameBufferSize", "2"));
 	config_reax.recognize_interval = stoi(cfg_reader.get("RecognizeInterval", "1"));
+	config_reax.count_bondorder = stob(cfg_reader.get("CountBondOrder", "false"));
 
 	config_analyzer = ReaxAnalyzer::Config();
 	string sample_method_str = cfg_reader.get("SampleMethod", "fixint");
@@ -87,6 +88,9 @@ int ReaxDetect::exec() {
 	printf("Writing raw results...\n");
 	if (write_option.write_fulldata && writer.Dump(input_name + "_full_dump.csv", input_name + "_full_reac.csv", reader)) {
 		error(ERROR_BAD_OUTPUT);
+	}
+	if (cfg_reader.get("CountBondOrder", "false") == "true") {
+		writer.WriteBondOrder(input_name + "_bondorder.csv", reader, simulation);
 	}
 	if (write_option.write_kineticfile) {
 		printf("Analysing Kinetic Results...\n");
@@ -207,6 +211,7 @@ void ReaxDetect::set_default_opt()
 	cfg_reader["ReadAtomPos"] = "false";
 	cfg_reader["FrameBufferSize"] = "2";
 	cfg_reader["RecognizeInterval"] = "1";
+	cfg_reader["CountBondOrder"] = "false";
 }
 
 void ReaxDetect::display_version() {
