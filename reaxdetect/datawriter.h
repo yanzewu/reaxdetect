@@ -18,8 +18,6 @@ public:
 
 	static int WriteReport(const string& path, const ReaxAnalyzer&);
 
-	static int WriteKineticFile(const string& path, const ReaxAnalyzer&);
-
 	static int WriteRawReactionFreq(const string& path, const ReaxAnalyzer&);
 
 	static int WriteBondOrder(const string& path, const ReaxReader&, const Simulation&);

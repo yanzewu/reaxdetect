@@ -37,6 +37,8 @@ int ReaxDetect::init(int argc, char** argv) {
 	write_option.write_kineticfile = 1;
 	write_option.write_rawdata = 1;
 
+	simulation.timeStep = 0.0;
+
 	int result = read_opt(argc, argv);
 	if (result) {
 		error(result);
@@ -139,7 +141,7 @@ int ReaxDetect::read_opt(int argc, char** argv) {
 		{ "", 0, 0, 0}
 	};
 	int longIndex;
-	int opt = getopt_long(argc, argv, "c:v:s:b:f:h", longOpts, &longIndex);
+	int opt = getopt_long(argc, argv, "c:v:s:t:b:f:h", longOpts, &longIndex);
 	while (opt != -1) {
 		switch (opt)
 		{
@@ -166,6 +168,9 @@ int ReaxDetect::read_opt(int argc, char** argv) {
 		case 's':
 			cfg_reader["SampleInterval"] = string(optarg);
 			cfg_reader["SampleRange"] = string(optarg);
+			break;
+		case 't':
+			simulation.timeStep = atof(optarg);
 			break;
 		case '?':
 		case 'h':
@@ -194,7 +199,7 @@ int ReaxDetect::read_opt(int argc, char** argv) {
 		default:
 			break;
 		}
-		opt = getopt_long(argc, argv, "c:v:s:b:f:h", longOpts, &longIndex);
+		opt = getopt_long(argc, argv, "c:v:s:t:b:f:h", longOpts, &longIndex);
 	}
 	input_path = string(argv[argc - 1]);
 	return 0;

@@ -32,8 +32,14 @@ int TrajReader::ReadTrjHead(Simulation* simulation) {
 	trjfile >> buffer >> simulation->name;
 	trjfile >> buffer >> simulation->atomNumber;
 	trjfile.seekg(2 * LINE_LENGTH, ios_base::cur);
-	trjfile >> buffer >> simulation->timeStep;
-	simulation->timeStep /= 1000.0;
+
+	if (simulation->timeStep == 0.0) {
+		trjfile >> buffer >> simulation->timeStep;
+		simulation->timeStep /= 1000.0;
+	}
+	else {
+		trjfile >> buffer >> buffer;
+	}
 
 	printf("Name: %s\n", simulation->name);
 	printf("Atom numbers: %d\n", simulation->atomNumber);
