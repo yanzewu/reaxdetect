@@ -1,5 +1,6 @@
 //read all kinds of TrajReader file
-#include"trajectory.h"
+#include "trajectory.h"
+#include "listhandler.h"
 
 #define DATA_LENGTH		24
 #define LINE_LENGTH		62

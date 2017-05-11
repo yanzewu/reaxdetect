@@ -105,14 +105,14 @@ void ReaxAnalyzer::CountReaction(const ReaxReader& rs)
 	for (auto fs = rs.fss.begin() + 1; fs < rs.fss.end(); fs++) {
 
 		for (size_t i = 0; i < rsize; i++) {
-			double product = 1.0;
+			unsigned int product = 1;
 			for (const auto& s : rs.reactions[i].reagants)
-				product *= (double)(fs - 1)->mol_freq[s];
+				product *= (fs - 1)->mol_freq[s];
 			sum_product_p[i] += product;
 
 			product = 1.0;
 			for (const auto& s : rs.reactions[i].products)
-				product *= (double)(fs - 1)->mol_freq[s];
+				product *= (fs - 1)->mol_freq[s];
 			sum_product_m[i] += product;
 
 		}
