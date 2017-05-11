@@ -18,7 +18,7 @@ public:
 
 		int read_atompos;
 		bool count_bondorder;
-		Config() : bondorder_cutoff_default(vector<double>{0.3, 0.5}), read_atompos(0) {
+		Config() : read_atompos(0) {
 		}
 	};
 

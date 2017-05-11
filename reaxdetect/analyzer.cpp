@@ -123,16 +123,19 @@ void ReaxAnalyzer::FixSample(const ReaxReader & reader, tsize_t sample_int, tsiz
 {
 	using namespace veccal;
 
-	for (size_t i = 0; i < reader.fss.size() - range; i += sample_int) {
+	for (size_t i = 0; i < reader.fss.size(); i += sample_int) {
 		Array sum_c(reader.molecules.size(), 0), sum_r(reader.reactions.size(), 0);
-		for (size_t j = 0; j < range; j++) {
+
+		size_t crt_range = min((size_t)range, reader.fss.size() - i);
+
+		for (size_t j = 0; j < crt_range; j++) {
 			sum_c += reader.fss[i + j].mol_freq;
 			sum_r += net(reader.fss[i + j].reaction_freq);
 		}
 		Sample sample;
-		mul_into(sum_c, 1 / (double)(range), sample.c);
-		mul_into(sum_r, 1 / (double)(range * interval), sample.r);
-		sample.t = interval*(i + range / 2);
+		mul_into(sum_c, 1 / (double)(crt_range), sample.c);
+		mul_into(sum_r, 1 / (double)(crt_range * interval), sample.r);
+		sample.t = interval*(i + crt_range / 2);
 		samples.push_back(sample);
 	}
 
