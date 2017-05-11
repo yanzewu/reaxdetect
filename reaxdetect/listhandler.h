@@ -111,3 +111,12 @@ inline void sortwith(vector<type1>& score, vector<type2>& assist, const order pr
 	}
 
 }
+
+template<class T>
+inline int floor_vec(const vector<T>& vec, const T& val) {
+	int i = 0;
+	for (; i < vec.size(); i++) {
+		if (val < vec[i])break;
+	}
+	return i - 1;
+}

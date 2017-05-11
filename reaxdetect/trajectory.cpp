@@ -16,8 +16,8 @@ inline int approx(double d) {
 
 template<class Name, class Val>
 inline const Val& get(const map<Name, Val>& m, const Name& n, const Val& d) {
-	map<Name, Val>::const_iterator k;
-	if ((k = m.find(n)) == m.end()) {
+	auto k = m.find(n);
+	if (k == m.end()) {
 		return d;
 	}
 	else {
@@ -25,14 +25,6 @@ inline const Val& get(const map<Name, Val>& m, const Name& n, const Val& d) {
 	}
 }
 
-template<class T>
-inline int floor_vec(const vector<T>& vec, const T& val) {
-	int i = 0;
-	for (; i < vec.size(); i++) {
-		if (val < vec[i])break;
-	}
-	return i - 1;
-}
 
 int TrajReader::Open(const string& filename) {
 	trjfile.open(filename, ios_base::in);
