@@ -82,7 +82,7 @@ int TrajReader::ReadTrjHead(Simulation* simulation) {
 	printf("Count bondorder=%s\n", config.count_bondorder ? "true" : "false");
 	printf("Bondcutoff:\nDefault=%s\n", join(config.bondorder_cutoff_default).c_str());
 	for (const auto& boc : config.bondorder_cutoff) {
-		printf("%d-%d=%s\n", boc.first / MAX_ATOM_TYPE, boc.first % MAX_ATOM_TYPE, join(boc.second));
+		printf("%d-%d=%s\n", boc.first / MAX_ATOM_TYPE, boc.first % MAX_ATOM_TYPE, join(boc.second).c_str());
 	}
 	return 0;
 }

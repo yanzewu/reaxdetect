@@ -23,6 +23,7 @@ public:
 	struct Config {
 		size_t buffer_size;
 		int recognize_interval;
+		int recognize_limit;
 		Config() : buffer_size(2) {
 		}
 	};

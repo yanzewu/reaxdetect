@@ -70,6 +70,7 @@ void ReaxDetect::translate_opt()
 
 	config_reax.buffer_size = stoul(cfg_reader.get("FrameBufferSize", "2"));
 	config_reax.recognize_interval = stoi(cfg_reader.get("RecognizeInterval", "1"));
+	config_reax.recognize_limit = stoi(cfg_reader.get("RecognizeLimit", "-1"));
 
 	config_analyzer = ReaxAnalyzer::Config();
 	string sample_method_str = cfg_reader.get("SampleMethod", "fixint");
@@ -162,7 +163,7 @@ int ReaxDetect::read_opt(int argc, char** argv) {
 		{ "", 0, 0, 0}
 	};
 	int longIndex;
-	int opt = getopt_long(argc, argv, "c:v:s:t:b:f:h", longOpts, &longIndex);
+	int opt = getopt_long(argc, argv, "c:v:s:t:b:f:l:h", longOpts, &longIndex);
 	while (opt != -1) {
 		switch (opt)
 		{
@@ -183,6 +184,8 @@ int ReaxDetect::read_opt(int argc, char** argv) {
 		case 'f':
 			cfg_reader["RecognizeInterval"] = string(optarg);
 			break;
+		case 'l':
+			cfg_reader["RecognizeLimit"] = string(optarg);
 		case 'v':
 			simulation.volume = atof(optarg);
 			break;
@@ -220,7 +223,7 @@ int ReaxDetect::read_opt(int argc, char** argv) {
 		default:
 			break;
 		}
-		opt = getopt_long(argc, argv, "c:v:s:t:b:f:h", longOpts, &longIndex);
+		opt = getopt_long(argc, argv, "c:v:s:t:b:f:l:h", longOpts, &longIndex);
 	}
 	input_path = string(argv[argc - 1]);
 	return 0;
@@ -237,6 +240,7 @@ void ReaxDetect::set_default_opt()
 	cfg_reader["ReadAtomPos"] = "false";
 	cfg_reader["FrameBufferSize"] = "2";
 	cfg_reader["RecognizeInterval"] = "1";
+	cfg_reader["RecognizeLimit"] = "-1";
 	cfg_reader["CountBondOrder"] = "false";
 }
 

@@ -34,6 +34,9 @@ int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 			buffer_i++;
 		}
 		i++;
+		if (i == config.recognize_limit) {
+			break;
+		}
 	}
 	for (size_t j = buffer_i - config.buffer_size + 1; j < buffer_i; j++) {
 		CommitReaction(fss[j]);
