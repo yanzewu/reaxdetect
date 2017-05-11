@@ -12,6 +12,7 @@
 #include "analyzer.h"
 #include "datawriter.h"
 #include "filenamehandler.h"
+#include "elementname.h"
 
 #define ERROR_NO_INPUT	0x01
 #define ERROR_BAD_INPUT 0x02
@@ -57,13 +58,18 @@ int ReaxDetect::init(int argc, char** argv) {
 void ReaxDetect::translate_opt()
 {
 	config_traj = TrajReader::Config();
-	config_traj.bondorder_cutoff = stod(cfg_reader.get("BondOrderCutoff", "0.5"));
-	config_traj.bondorder_cutoff_lo = stod(cfg_reader.get("BondOrderCutoffLow", "0.3"));
 	config_traj.read_atompos = stob(cfg_reader.get("ReadAtomPos", "false"));
+	config_traj.count_bondorder = stob(cfg_reader.get("CountBondOrder", "false"));
+	for (const auto& c : split(cfg_reader.get("BondOrderCutoffDefault", "0.3,0.5"), -1, ',')) {
+		config_traj.bondorder_cutoff_default.push_back(stod(c));
+	}
+	string boc_path;
+	if ((boc_path = cfg_reader.get("BondOrderCutoff", "default")) != "default") {
+		read_boc(boc_path, config_traj.bondorder_cutoff);
+	}
 
 	config_reax.buffer_size = stoul(cfg_reader.get("FrameBufferSize", "2"));
 	config_reax.recognize_interval = stoi(cfg_reader.get("RecognizeInterval", "1"));
-	config_reax.count_bondorder = stob(cfg_reader.get("CountBondOrder", "false"));
 
 	config_analyzer = ReaxAnalyzer::Config();
 	string sample_method_str = cfg_reader.get("SampleMethod", "fixint");
@@ -92,7 +98,7 @@ int ReaxDetect::exec() {
 		error(ERROR_BAD_OUTPUT);
 	}
 	if (cfg_reader.get("CountBondOrder", "false") == "true") {
-		writer.WriteBondOrder(input_name + "_bondorder.csv", reader, simulation);
+		writer.WriteBondOrder(input_name + "_bondorder.csv", traj);
 	}
 	if (write_option.write_kineticfile) {
 		printf("Analysing Kinetic Results...\n");
@@ -128,6 +134,21 @@ int ReaxDetect::error(int errorcode) {
 	}
 	exit(errorcode);
 	return 1;
+}
+
+int ReaxDetect::read_boc(const string & filename, map<int, Arrayd>& bondorder_cutoff)
+{
+	ConfigReader boc_reader;
+	boc_reader.read_data(filename);
+	for (const auto& item : boc_reader._items) {
+		vector<string> atom_names = split(item.first, 1, '-');
+		int type1 = NameWeight.at(atom_names[0]), type2 = NameWeight.at(atom_names[1]);
+		int bond_identifier = type1 >= type2 ? type1 * MAX_ATOM_TYPE + type2 : type2 * MAX_ATOM_TYPE + type1;
+		for (const auto& c : split(item.second, -1, ',')) {
+			bondorder_cutoff[bond_identifier].push_back(stof(c));
+		}
+	}
+	return 0;
 }
 
 // bottom api
@@ -207,8 +228,8 @@ int ReaxDetect::read_opt(int argc, char** argv) {
 
 void ReaxDetect::set_default_opt()
 {
-	cfg_reader["BondOrderCutoff"] = "0.5";
-	cfg_reader["BondOrderCutoffLow"] = "0.3";
+	cfg_reader["BondOrderCutoffDefault"] = "0.3,0.5";
+	cfg_reader["BondOrderCutoff"] = "default";
 	cfg_reader["SampleMethod"] = "fix_int";
 	cfg_reader["SampleInterval"] = "1000";
 	cfg_reader["SampleRange"] = "1000";

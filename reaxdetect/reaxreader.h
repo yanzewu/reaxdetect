@@ -23,7 +23,6 @@ public:
 	struct Config {
 		size_t buffer_size;
 		int recognize_interval;
-		bool count_bondorder;
 		Config() : buffer_size(2) {
 		}
 	};
@@ -52,7 +51,6 @@ public:
 	};
 
 	vector<FrameStat> fss;			//Raw data. Do not use directly.
-	map<int, vector<double> > bondorders; // statistics of bond order
 	vector<smiles> molecules;		//Smiles of all molecules in the trajectory. Do not use directly.
 	vector<string> species;			// name of species
 	vector<Reaction> reactions;		//List of all different reactions

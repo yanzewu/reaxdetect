@@ -96,7 +96,7 @@ int ReaxDataWriter::WriteRawReactionFreq(const string & path, const ReaxAnalyzer
 	return 0;
 }
 
-int ReaxDataWriter::WriteBondOrder(const string & path, const ReaxReader & reader, const Simulation& simulation)
+int ReaxDataWriter::WriteBondOrder(const string & path, const TrajReader & reader)
 {
 	ofstream outfile(path, ios_base::out);
 	for (const auto& entry : reader.bondorders) {

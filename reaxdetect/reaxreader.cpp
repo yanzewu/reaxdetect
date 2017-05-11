@@ -22,9 +22,6 @@ int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 	size_t buffer_i = 0;
 	while (reader.ReadTrjFrame(_frame)) {
 		if (i % config.recognize_interval == 0) {
-			if (config.count_bondorder) {
-				CountBondOrder(_frame, reader.atomWeights);
-			}
 			FrameStat fstat;
 			fstat.t = simulation.timeStep * i;
 			RecognizeMolecule(_frame, reader.atomWeights, simulation.atomNumber, fstat);
@@ -214,15 +211,6 @@ void ReaxReader::CommitReaction(FrameStat & fs_commit)
 			fs_commit.reaction_freq.push_back(diint(1, 0));
 		}
 	}
-}
-
-void ReaxReader::CountBondOrder(const TrajReader::Frame & frm, const Arrayd & atomWeights)
-{
-	for (const auto& bond : frm.bonds) {
-		int type1 = int(atomWeights[bond.id_1] + 0.1), type2 = int(atomWeights[bond.id_2] + 0.1);
-		bondorders[type1 > type2 ? (type1 * MAX_ATOM_TYPE + type2) : (type2 * MAX_ATOM_TYPE + type1)].push_back(bond.raw_order);
-	}
-
 }
 
 void ReaxReader::Check()

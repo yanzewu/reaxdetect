@@ -1,8 +1,9 @@
 //read all kinds of TrajReader file
 #include"trajectory.h"
 
-#define DATA_LENGTH	24
-#define LINE_LENGTH	62
+#define DATA_LENGTH		24
+#define LINE_LENGTH		62
+#define MAX_ATOM_TYPE	256
 
 inline int approx(double d) {
 	if (d - (int)d > 0.5) {
@@ -11,6 +12,26 @@ inline int approx(double d) {
 	else {
 		return (int)d;
 	}
+}
+
+template<class Name, class Val>
+inline const Val& get(const map<Name, Val>& m, const Name& n, const Val& d) {
+	map<Name, Val>::const_iterator k;
+	if ((k = m.find(n)) == m.end()) {
+		return d;
+	}
+	else {
+		return k->second;
+	}
+}
+
+template<class T>
+inline int floor_vec(const vector<T>& vec, const T& val) {
+	int i = 0;
+	for (; i < vec.size(); i++) {
+		if (val < vec[i])break;
+	}
+	return i - 1;
 }
 
 int TrajReader::Open(const string& filename) {
@@ -99,13 +120,19 @@ int TrajReader::ReadTrjFrame(Frame& frameOut) {
 	trjfile >> bondNumber;
 	frameOut.bonds.clear();
 	for (int i = 0; i < bondNumber; i++) {
-		bond crtBond; double length;
-		trjfile >> crtBond.id_1 >> crtBond.id_2 >> length >> crtBond.raw_order;
-		if (crtBond.raw_order > config.bondorder_cutoff_lo) {
-			if (crtBond.raw_order > config.bondorder_cutoff) {
-				crtBond.order = 1;// approx(order);
-			}
+		bond crtBond; double length, raw_order;
+		trjfile >> crtBond.id_1 >> crtBond.id_2 >> length >> raw_order;
+
+		int type1 = int(atomWeights[crtBond.id_1] + 0.1), type2 = int(atomWeights[crtBond.id_2] + 0.1);
+		int bond_identifier = type1 > type2 ? (type1 * MAX_ATOM_TYPE + type2) : (type2 * MAX_ATOM_TYPE + type1);
+
+		crtBond.order = floor_vec(get(config.bondorder_cutoff, bond_identifier, config.bondorder_cutoff_default), raw_order);
+
+		if (crtBond.order >= 0) {
 			frameOut.bonds.push_back(crtBond);
+		}
+		if (config.count_bondorder) {
+			bondorders[bond_identifier].push_back(raw_order);
 		}
 	}
 	return 1;

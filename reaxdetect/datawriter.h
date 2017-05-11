@@ -20,7 +20,7 @@ public:
 
 	static int WriteRawReactionFreq(const string& path, const ReaxAnalyzer&);
 
-	static int WriteBondOrder(const string& path, const ReaxReader&, const Simulation&);
+	static int WriteBondOrder(const string& path, const TrajReader&);
 };
 
 #endif // !DATAWRITER_H

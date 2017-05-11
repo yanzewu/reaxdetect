@@ -30,6 +30,11 @@ const map<string, int> NameLWeight = {
 	{"[Na]", 23}, {"[Mg]", 24}, {"[Al]", 27}, {"[Si]", 28}, {"P", 31}, {"S", 32}, {"[Cl]", 35}
 };
 
+const map<string, int> NameWeight = {
+	{ "H", 1 },{ "Li", 6 },{ "Be", 8 },{ "B", 11 },{ "C", 12 },{ "N", 14 },{ "O", 16 },{ "F", 19 },
+	{ "Na", 23 },{ "Mg", 24 },{ "Al", 27 },{ "Si", 28 },{ "P", 31 },{ "S", 32 },{ "Cl", 35 }
+};
+
 const string ShortNames = "HBCNOFPS";
 
 const map<int, int> DefaultHydrogen = {

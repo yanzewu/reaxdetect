@@ -39,6 +39,8 @@ private:
 
 	static int error(int errorcode);
 
+	static int read_boc(const string& filename, map<int, Arrayd>&);
+
 	Simulation simulation;
 	ConfigReader cfg_reader;
 	ReaxAnalyzer::Config config_analyzer;

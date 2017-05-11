@@ -6,16 +6,19 @@
 #define TRAJECTORY_H
 
 #include "simulation.h"
+#include <map>
 
 // reader of various trajectory file
 class TrajReader {
 public:
 
 	struct Config {
-		double bondorder_cutoff;
-		double bondorder_cutoff_lo;
+		map<int, vector<double> > bondorder_cutoff;
+		vector<double> bondorder_cutoff_default;
+
 		int read_atompos;
-		Config() : bondorder_cutoff_lo(0.3), bondorder_cutoff(0.5), read_atompos(0) {
+		bool count_bondorder;
+		Config() : bondorder_cutoff_default(vector<double>{0.3, 0.5}), read_atompos(0) {
 		}
 	};
 
@@ -27,7 +30,7 @@ public:
 	struct bond{
 		int id_1, id_2;
 		int order;
-		double raw_order;
+//		double raw_order;
 		bond() : order(0) {}
 		bond(int a, int b) : id_1(a), id_2(b), order(1) {
 		}
@@ -35,12 +38,14 @@ public:
 
 	//Data Structure recording information of atoms and bonds
 	struct Frame {
-		list<atom> atoms;
-		list<bond> bonds;
+		vector<atom> atoms;
+		vector<bond> bonds;
 	};	
 
 	vector<int> atomTypes;		//Atom Types List
 	vector<double> atomWeights;	//Atom Weights List
+	
+	map<int, vector<int> > bondorders; // Bond order statistics
 
 	TrajReader() : config() {
 	}
