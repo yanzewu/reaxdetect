@@ -1,6 +1,7 @@
 //read all kinds of TrajReader file
 #include "trajectory.h"
 #include "listhandler.h"
+#include "stringconvert.h"
 
 #define DATA_LENGTH		24
 #define LINE_LENGTH		62
@@ -76,6 +77,12 @@ int TrajReader::ReadTrjHead(Simulation* simulation) {
 	for (auto w = atomWeights.begin() + 1; w != atomWeights.end(); w++) {
 		if (find(simulation->atomWeights.begin(), simulation->atomWeights.end(), *w) == simulation->atomWeights.end())
 			simulation->atomWeights.push_back(*w);
+	}
+
+	printf("Count bondorder=%s\n", config.count_bondorder ? "true" : "false");
+	printf("Bondcutoff:\nDefault=%s\n", join(config.bondorder_cutoff_default).c_str());
+	for (const auto& boc : config.bondorder_cutoff) {
+		printf("%d-%d=%s\n", boc.first / MAX_ATOM_TYPE, boc.first % MAX_ATOM_TYPE, join(boc.second));
 	}
 	return 0;
 }
