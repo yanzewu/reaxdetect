@@ -45,7 +45,7 @@ public:
 	vector<int> atomTypes;		//Atom Types List
 	vector<double> atomWeights;	//Atom Weights List
 	
-	map<int, Arrayd> bondorders; // Bond order statistics
+	map<int, vector<double> > bondorders; // Bond order statistics
 
 	TrajReader() : config() {
 	}
