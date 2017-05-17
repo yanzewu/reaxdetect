@@ -34,7 +34,7 @@ void ReaxAnalyzer::HandleData(const ReaxReader& reader, const Simulation& simula
 	CalcMolLife(reader, simulation.timeStep);
 	
 	printf("Calculating reaction product...\n");
-	double interval = simulation.timeStep * (reader.fss[1].t - reader.fss[0].t);
+	double interval = reader.fss[1].t - reader.fss[0].t;
 	printf("Interval: %.3e\n", interval);
 	CountReaction(reader);
 
