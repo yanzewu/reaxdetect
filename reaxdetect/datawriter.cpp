@@ -111,3 +111,11 @@ int ReaxDataWriter::WriteBondOrder(const string & path, const TrajReader & reade
 
 	return 0;
 }
+
+int ReaxDataWriter::WriteConfig(const string & path, const Simulation & simulation, const ReaxReader& reader)
+{
+	ofstream outfile(path, ios_base::out);
+	outfile << "interval=" << reader.fss[0].t - reader.fss[0].t << "\n";
+	outfile << "volume=" << simulation.volume << "\n";
+	return 0;
+}

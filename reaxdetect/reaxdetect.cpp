@@ -99,6 +99,7 @@ int ReaxDetect::exec() {
 	if (write_option.write_fulldata && writer.Dump(input_name + "_full_dump.csv", input_name + "_full_reac.csv", reader)) {
 		error(ERROR_BAD_OUTPUT);
 	}
+	writer.WriteConfig(input_name + "_config.txt", simulation, reader);
 	if (cfg_reader.get("CountBondOrder", "false") == "true") {
 		writer.WriteBondOrder(input_name + "_bondorder.csv", traj);
 	}
