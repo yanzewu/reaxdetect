@@ -47,12 +47,16 @@ int ReaxDataWriter::WriteSample(const string& sample_path, const ReaxAnalyzer& a
 	outfile << "SPECIES\nt,";
 	outfile << join(analyzer.species) << "\n";
 	for (const auto& sample : analyzer.samples) {
-		outfile << sample.t << "," << join(sample.c) << "\n";
+		outfile << sample.t;
+		for (const auto& c_ : sample.c) outfile << "," << c_;
+		outfile << "\n";
 	}
 	outfile << "END\nREACTIONS\nt,";
 	outfile << join(analyzer.reactions) << "\n";
 	for (const auto& sample : analyzer.samples) {
-		outfile << sample.t << "," << join(sample.r) << "\n";
+		outfile << sample.t;
+		for (const auto& r_ : sample.r) outfile << "," << r_;
+		outfile << "\n";
 	}
 	outfile << "END\nINIT\n";
 	for (const auto& i : analyzer.init) {
