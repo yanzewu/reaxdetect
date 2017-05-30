@@ -39,6 +39,7 @@ int ReaxDetect::init(int argc, char** argv) {
 	write_option.write_rawdata = 1;
 
 	simulation.timeStep = 0.0;
+	simulation.volume = 1.0;
 
 	int result = read_opt(argc, argv);
 	if (result) {
@@ -130,6 +131,9 @@ int ReaxDetect::error(int errorcode) {
 	case ERROR_BAD_OUTPUT:
 		printf("Error: Cannot write output file.\n");
 		break;
+	case ERROR_NO_EXEC:
+		exit(0);
+		break;
 	default:
 		break;
 	}
@@ -216,7 +220,7 @@ int ReaxDetect::read_opt(int argc, char** argv) {
 				}
 			}
 			else if (string(longOpts[longIndex].name) == "config") {
-				cfg_reader.read_data(path::split(argv[0])[0] + default_config_path);
+				cfg_reader.fresh_data(path::split(argv[0])[0] + default_config_path);
 				return ERROR_NO_EXEC;
 			}
 			break;
@@ -236,7 +240,6 @@ void ReaxDetect::set_default_opt()
 	cfg_reader["SampleMethod"] = "fix_int";
 	cfg_reader["SampleInterval"] = "1000";
 	cfg_reader["SampleRange"] = "1000";
-	cfg_reader["RateConstantConfidence"] = "0.95";
 	cfg_reader["ReadAtomPos"] = "false";
 	cfg_reader["FrameBufferSize"] = "2";
 	cfg_reader["RecognizeInterval"] = "1";

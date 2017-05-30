@@ -39,6 +39,14 @@ public:
 		file.close();
 	}
 
+	void fresh_data(const string& path)const {
+		ofstream file(path, ios_base::out);
+		for (const auto& item : _items) {
+			file << item.first << split_char << item.second << endl;
+		}
+		file.close();
+	}
+
 	const string& get(const string& name, const string& d) {
 		auto result = _items.find(name);
 		if (result == _items.end())return d;

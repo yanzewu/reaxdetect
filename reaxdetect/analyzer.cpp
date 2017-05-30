@@ -133,8 +133,8 @@ void ReaxAnalyzer::FixSample(const ReaxReader & reader, tsize_t sample_int, tsiz
 			sum_r += net(reader.fss[i + j].reaction_freq);
 		}
 		Sample sample;
-		mul_into(sum_c, 1 / (double)(crt_range), sample.c);
-		mul_into(sum_r, 1 / (double)(crt_range * interval), sample.r);
+		mul_into(sum_c, 1 / (double)(crt_range * volume), sample.c);
+		mul_into(sum_r, 1 / (double)(crt_range * interval * volume), sample.r);
 		sample.t = interval*(i + crt_range / 2);
 		samples.push_back(sample);
 	}
