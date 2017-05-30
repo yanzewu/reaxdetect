@@ -15,7 +15,7 @@ void ReaxAnalyzer::HandleData(const ReaxReader& reader, const Simulation& simula
 
 	for (int i = 0; i < reader.species.size(); i++) {
 		if (reader.fss[0].mol_freq[i] == 0)break;
-		init[reader.species[i]] = reader.fss[0].mol_freq[i];
+		init[reader.species[i]] = reader.fss[0].mol_freq[i] / simulation.volume;
 	}
 
 	printf("\nConcentration of reactants are:\n");
@@ -123,7 +123,7 @@ void ReaxAnalyzer::FixSample(const ReaxReader & reader, tsize_t sample_int, tsiz
 {
 	using namespace veccal;
 
-	for (size_t i = 0; i < reader.fss.size(); i += sample_int) {
+	for (size_t i = 0; i < reader.fss.size() - range / 4; i += sample_int) {
 		Array sum_c(reader.molecules.size(), 0), sum_r(reader.reactions.size(), 0);
 
 		size_t crt_range = min((size_t)range, reader.fss.size() - i);
