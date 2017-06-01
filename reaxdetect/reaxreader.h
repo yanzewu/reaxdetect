@@ -24,7 +24,8 @@ public:
 		size_t buffer_size;
 		int recognize_interval;
 		int recognize_limit;
-		Config() : buffer_size(2) {
+		int recognize_begin;
+		Config() : buffer_size(2), recognize_begin(0) {
 		}
 	};
 

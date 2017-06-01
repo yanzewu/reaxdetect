@@ -72,6 +72,7 @@ void ReaxDetect::translate_opt()
 	config_reax.buffer_size = stoul(cfg_reader.get("FrameBufferSize", "2"));
 	config_reax.recognize_interval = stoi(cfg_reader.get("RecognizeInterval", "1"));
 	config_reax.recognize_limit = stoi(cfg_reader.get("RecognizeLimit", "-1"));
+	config_reax.recognize_begin = stoi(cfg_reader.get("RecognizeBegin", "0"));
 
 	config_analyzer = ReaxAnalyzer::Config();
 	string sample_method_str = cfg_reader.get("SampleMethod", "fixint");
@@ -244,6 +245,7 @@ void ReaxDetect::set_default_opt()
 	cfg_reader["ReadAtomPos"] = "false";
 	cfg_reader["FrameBufferSize"] = "2";
 	cfg_reader["RecognizeInterval"] = "1";
+	cfg_reader["RecognizeBegin"] = "0";
 	cfg_reader["RecognizeLimit"] = "-1";
 	cfg_reader["CountBondOrder"] = "false";
 }

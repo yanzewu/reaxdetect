@@ -21,7 +21,7 @@ int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 	size_t i = 0;
 	size_t buffer_i = 0;
 	while (reader.ReadTrjFrame(_frame)) {
-		if (i % config.recognize_interval == 0) {
+		if (i % config.recognize_interval == 0 && i >= config.recognize_begin) {
 			FrameStat fstat;
 			fstat.t = simulation.timeStep * i;
 			RecognizeMolecule(_frame, reader.atomWeights, simulation.atomNumber, fstat);
