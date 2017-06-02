@@ -40,8 +40,8 @@ void ReaxAnalyzer::HandleData(const ReaxReader& reader, const Simulation& simula
 
 	printf("Sampling...\n");
 	if (config.sample_method == SAMPLE_FIXINT) {
-		tsize_t sample_int = (tsize_t)(config.sample_int / simulation.timeStep);
-		tsize_t sample_range = (tsize_t)(config.sample_range / simulation.timeStep);
+		tsize_t sample_int = (tsize_t)(config.sample_int / interval);
+		tsize_t sample_range = (tsize_t)(config.sample_range / interval);
 
 		printf("Using fixed sample with interval %f(%d), range %f(%d)\n", config.sample_int, sample_int, config.sample_range, sample_range);
 		FixSample(reader, config.sample_int, config.sample_range, interval, simulation.volume);
