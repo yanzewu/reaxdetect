@@ -20,7 +20,7 @@ void ReaxAnalyzer::HandleData(const ReaxReader& reader, const Simulation& simula
 
 	printf("\nConcentration of reactants are:\n");
 	for (const auto& reactant : init) {
-		printf("%s\t%d\n", reactant.first.c_str(), reactant.second);
+		printf("%s\t%.3e\n", reactant.first.c_str(), reactant.second);
 	}
 
 	printf("Encoding reactions...\n");
@@ -40,7 +40,10 @@ void ReaxAnalyzer::HandleData(const ReaxReader& reader, const Simulation& simula
 
 	printf("Sampling...\n");
 	if (config.sample_method == SAMPLE_FIXINT) {
-		printf("Using fixed sample with interval %d, range %d\n", config.sample_int, config.sample_range);
+		tsize_t sample_int = (tsize_t)(config.sample_int / simulation.timeStep);
+		tsize_t sample_range = (tsize_t)(config.sample_range / simulation.timeStep);
+
+		printf("Using fixed sample with interval %f(%d), range %f(%d)\n", sample_int, sample_range);
 		FixSample(reader, config.sample_int, config.sample_range, interval, simulation.volume);
 	}
 	else {
@@ -123,7 +126,7 @@ void ReaxAnalyzer::FixSample(const ReaxReader & reader, tsize_t sample_int, tsiz
 {
 	using namespace veccal;
 
-	for (size_t i = 0; i < reader.fss.size() - range / 4; i += sample_int) {
+	for (size_t i = 0; i < reader.fss.size() - range; i += sample_int) {
 		Array sum_c(reader.molecules.size(), 0), sum_r(reader.reactions.size(), 0);
 
 		size_t crt_range = min((size_t)range, reader.fss.size() - i);

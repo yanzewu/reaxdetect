@@ -61,7 +61,7 @@ void ReaxDetect::translate_opt()
 	config_traj = TrajReader::Config();
 	config_traj.read_atompos = stob(cfg_reader.get("ReadAtomPos", "false"));
 	config_traj.count_bondorder = stob(cfg_reader.get("CountBondOrder", "false"));
-	for (const auto& c : split(cfg_reader.get("BondOrderCutoffDefault", "0.3,0.5"), -1, ',')) {
+	for (const auto& c : split(cfg_reader.get("BondOrderCutoffDefault", "0.5,0.5"), -1, ',')) {
 		config_traj.bondorder_cutoff_default.push_back(stod(c));
 	}
 	string boc_path;
@@ -79,8 +79,8 @@ void ReaxDetect::translate_opt()
 	if (sample_method_str == "fixint") {
 		config_analyzer.sample_method = SAMPLE_FIXINT;
 	}
-	config_analyzer.sample_int = stoi(cfg_reader.get("SampleInterval", "1000"));
-	config_analyzer.sample_range = stoi(cfg_reader.get("SampleRange", "1000"));
+	config_analyzer.sample_int = stod(cfg_reader.get("SampleInterval", "200.0"));
+	config_analyzer.sample_range = stod(cfg_reader.get("SampleRange", "200.0"));
 }
 
 int ReaxDetect::exec() {
@@ -237,11 +237,11 @@ int ReaxDetect::read_opt(int argc, char** argv) {
 
 void ReaxDetect::set_default_opt()
 {
-	cfg_reader["BondOrderCutoffDefault"] = "0.3,0.5";
+	cfg_reader["BondOrderCutoffDefault"] = "0.5,0.5";
 	cfg_reader["BondOrderCutoff"] = "default";
 	cfg_reader["SampleMethod"] = "fix_int";
-	cfg_reader["SampleInterval"] = "1000";
-	cfg_reader["SampleRange"] = "1000";
+	cfg_reader["SampleInterval"] = "200.0";
+	cfg_reader["SampleRange"] = "200.0";
 	cfg_reader["ReadAtomPos"] = "false";
 	cfg_reader["FrameBufferSize"] = "2";
 	cfg_reader["RecognizeInterval"] = "1";

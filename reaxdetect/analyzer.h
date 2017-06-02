@@ -33,8 +33,8 @@ public:
 
 	struct Config {
 		char sample_method;
-		tsize_t sample_int;
-		tsize_t sample_range;
+		double sample_int;
+		double sample_range;
 		Config() : sample_method(SAMPLE_FIXINT) {
 		}
 	};

@@ -13,6 +13,8 @@ int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 {
 	printf("Buffer size=%d\n", config.buffer_size);
 	printf("Read interval=%d\n", config.recognize_interval);
+	printf("Read begin=%d\n", config.recognize_begin);
+	printf("Read end=%d\n", config.recognize_limit);
 
 	_buffer_pages = new BufferPage[config.buffer_size];
 
