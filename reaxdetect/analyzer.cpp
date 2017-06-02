@@ -44,7 +44,7 @@ void ReaxAnalyzer::HandleData(const ReaxReader& reader, const Simulation& simula
 		tsize_t sample_range = (tsize_t)(config.sample_range / interval);
 
 		printf("Using fixed sample with interval %f(%d), range %f(%d)\n", config.sample_int, sample_int, config.sample_range, sample_range);
-		FixSample(reader, config.sample_int, config.sample_range, interval, simulation.volume);
+		FixSample(reader, sample_int, sample_range, interval, simulation.volume);
 	}
 	else {
 		printf("Unknown sample method\n");
