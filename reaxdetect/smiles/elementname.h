@@ -1,5 +1,12 @@
 #pragma once
-#include<map>
+
+#ifndef ELEMENTNAME_H
+#define ELEMENTNAME_H
+
+#include <map>
+#include <string>
+
+using namespace std;
 
 //used as element name storage
 
@@ -41,3 +48,5 @@ const map<int, int> DefaultHydrogen = {
 	{1, 1}, {3, 1}, {8, 2}, {11, 3}, {12, 4}, {14, 3}, {16, 2}, {19, 1},
 	{23, 0}, {24, 0}, {27, 3}, {28, 4}, {31, 3}, {32, 2}, {35, 1}
 };
+
+#endif

@@ -3,10 +3,14 @@
 #ifndef REACTIONSTAT_H
 #define REACTIONSTAT_H
 
-#include "includes.h"
+#include <vector>
+#include <list>
+
 #include "typedef.h"
 #include "trajectory.h"
-#include "smiles.h"
+#include "smiles/smiles.h"
+
+using namespace std;
 
 #define MAX_ATOM_TYPE	256
 

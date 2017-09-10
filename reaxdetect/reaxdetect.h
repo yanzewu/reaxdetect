@@ -1,16 +1,21 @@
-// New class for ui
-// Add in version 2.2.2; 
+/* ReaxDetect 
+ * A tool analyzing LAMMPS trajectory file with Reaction Force Field.
+ * Written by Yanze Wu (https://github.com/flipboards)
+*/
 
 #pragma once
 #ifndef REAXDETECT_H
 #define REAXDETECT_H
 
+#include <string>
+#include <map>
 
-#include "includes.h"
-#include "confighandler.h"
-#include "simulation.h"
-#include "reaxreader.h"
 #include "analyzer.h"
+#include "reaxreader.h"
+#include "simulation.h"
+#include "util/config.h"
+
+using namespace std;
 
 #define MYVERSION 30101
 
@@ -33,11 +38,9 @@ private:
 
 	void translate_opt();
 
-	void display_help();
+    static void display_help();
 
-	void display_version();
-
-	static int error(int errorcode);
+	static void display_version();
 
 	static int read_boc(const string& filename, map<int, Arrayd>&);
 

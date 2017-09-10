@@ -1,6 +1,8 @@
 #pragma once
 
-#include <stdio.h>
+#ifndef STRUTIL_H
+#define STRUTIL_H
+
 #include <string>
 #include <vector>
 
@@ -18,3 +20,5 @@ vector<string> split(const string& str, int num = -1, char symbol = ' ');
 string join(const vector<string>&, const string& symbol = ",");
 string join(const vector<int>&, const string& symbol = ",");
 string join(const vector<double>&, const string& symbol = ",");
+
+#endif

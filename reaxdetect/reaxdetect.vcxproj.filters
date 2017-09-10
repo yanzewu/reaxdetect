@@ -9,47 +9,20 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="head\management">
-      <UniqueIdentifier>{7fe3310e-25ef-4c6d-8917-fc3b3a8f511f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="head\tools">
-      <UniqueIdentifier>{ec42c2f4-ace0-4a5e-8041-ca5c9fb01edb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resources">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="util">
+      <UniqueIdentifier>{ec42c2f4-ace0-4a5e-8041-ca5c9fb01edb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="smiles">
+      <UniqueIdentifier>{6523d7b2-c716-45b9-8170-db703009e76a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="trajectory.h">
       <Filter>head</Filter>
-    </ClInclude>
-    <ClInclude Include="reaxdetect.h">
-      <Filter>head\management</Filter>
-    </ClInclude>
-    <ClInclude Include="typedef.h">
-      <Filter>head\management</Filter>
-    </ClInclude>
-    <ClInclude Include="smiles.h">
-      <Filter>head</Filter>
-    </ClInclude>
-    <ClInclude Include="confighandler.h">
-      <Filter>head\tools</Filter>
-    </ClInclude>
-    <ClInclude Include="elementname.h">
-      <Filter>head\tools</Filter>
-    </ClInclude>
-    <ClInclude Include="filenamehandler.h">
-      <Filter>head\tools</Filter>
-    </ClInclude>
-    <ClInclude Include="includes.h">
-      <Filter>head\management</Filter>
-    </ClInclude>
-    <ClInclude Include="listhandler.h">
-      <Filter>head\tools</Filter>
-    </ClInclude>
-    <ClInclude Include="stringconvert.h">
-      <Filter>head\tools</Filter>
     </ClInclude>
     <ClInclude Include="simulation.h">
       <Filter>head</Filter>
@@ -57,13 +30,46 @@
     <ClInclude Include="reaxreader.h">
       <Filter>head</Filter>
     </ClInclude>
-    <ClInclude Include="numarray.h">
-      <Filter>head\tools</Filter>
-    </ClInclude>
     <ClInclude Include="datawriter.h">
       <Filter>head</Filter>
     </ClInclude>
     <ClInclude Include="analyzer.h">
+      <Filter>head</Filter>
+    </ClInclude>
+    <ClInclude Include="reaxdetect.h">
+      <Filter>head</Filter>
+    </ClInclude>
+    <ClInclude Include="errors.h">
+      <Filter>head</Filter>
+    </ClInclude>
+    <ClInclude Include="util\strutil.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\path.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\vecutil.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\elements.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\algorithmutil.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="smiles\elementname.h">
+      <Filter>smiles</Filter>
+    </ClInclude>
+    <ClInclude Include="smiles\smiles.h">
+      <Filter>smiles</Filter>
+    </ClInclude>
+    <ClInclude Include="smiles\tablesort.h">
+      <Filter>smiles</Filter>
+    </ClInclude>
+    <ClInclude Include="util\config.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="typedef.h">
       <Filter>head</Filter>
     </ClInclude>
   </ItemGroup>
@@ -72,9 +78,6 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="smiles.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="reaxdetect.cpp">
@@ -92,20 +95,26 @@
     <ClCompile Include="datawriter.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="stringconvert.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="analyzer.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="filenamehandler.cpp">
-      <Filter>source</Filter>
+    <ClCompile Include="util\strutil.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\path.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="smiles\smiles.cpp">
+      <Filter>smiles</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="update.txt">
       <Filter>head</Filter>
     </Text>
-    <Text Include="makefile" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md" />
+    <None Include="..\makefile" />
   </ItemGroup>
 </Project>

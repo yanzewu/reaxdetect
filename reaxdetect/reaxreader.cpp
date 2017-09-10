@@ -1,8 +1,12 @@
 //contains algorithm about molecule and Reaction generate
+
+#include <functional>
+#include <iostream>
+
 #include "reaxreader.h"
-#include "smiles.h"
-#include "filenamehandler.h"
-#include "listhandler.h"
+#include "smiles/smiles.h"
+#include "util/algorithmutil.h"
+#include "util/path.h"
 
 #define FLAG_REAGANT 0
 #define FLAG_PRODUCT 1
@@ -11,7 +15,7 @@
 
 int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 {
-	printf("Buffer size=%d\n", config.buffer_size);
+	printf("Buffer size=%zd\n", config.buffer_size);
 	printf("Read interval=%d\n", config.recognize_interval);
 	printf("Read begin=%d\n", config.recognize_begin);
 	printf("Read end=%d\n", config.recognize_limit);
@@ -43,7 +47,7 @@ int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 	for (size_t j = buffer_i - config.buffer_size + 1; j < buffer_i; j++) {
 		CommitReaction(fss[j]);
 	}
-	printf("Total %d frames read, with %d molecules and %d reactions.\n", fss.size(), molecules.size(), reactions.size());
+	printf("Total %zd frames read, with %zd molecules and %zd reactions.\n", fss.size(), molecules.size(), reactions.size());
 
 	printf("Encoding smiles...\n");
 	for (auto& mol : molecules) {
@@ -131,7 +135,7 @@ void ReaxReader::RecognizeMolecule(const TrajReader::Frame& frm, const Arrayd& a
 	_crt_buffer->mol_idx.resize(molRoots.size());
 
 	for (tsize_t i = 0; i < _crt_buffer->molecule.size(); i++) {
-		_crt_buffer->mol_idx[i] = pushnew2index(i, _crt_buffer->molecule, uroots, uFreq);
+		_crt_buffer->mol_idx[i] = (int)pushnew2index(i, _crt_buffer->molecule, uroots, uFreq);
 	}
 
 	//5.final: get smiles: O(m^2*log(m))
@@ -148,7 +152,7 @@ void ReaxReader::RecognizeMolecule(const TrajReader::Frame& frm, const Arrayd& a
 		else {
 			molecules.push_back(move(newsms));
 			fs.mol_freq.push_back(uFreq[i]);
-			uindex[i] = molecules.size() - 1;
+			uindex[i] = (int)molecules.size() - 1;
 		}
 	}
 	//6.restore uindex to index: O(N)
@@ -265,7 +269,7 @@ void ReaxReader::Check()
 void ReaxReader::scan_score(int index, const Arrayd& atomweight, BufferPage* buffer, Mark marks, Array& mol_roots) {
 
 	marks[index] = true;
-	buffer->mol_of_atom[index] = mol_roots.size() - 1;
+	buffer->mol_of_atom[index] = (int)mol_roots.size() - 1;
 	int weight = (int)(atomweight[index] + 0.1);
 	int nhcon = 0;
 	int bondcon = 0;
@@ -274,7 +278,7 @@ void ReaxReader::scan_score(int index, const Arrayd& atomweight, BufferPage* buf
 		if (child.second == 0 || atomweight[child.first] >= 2 || buffer->bond_matrix[child.first].size() > 1)nhcon++;//not terminal H
 		if (!marks[child.first])scan_score(child.first, atomweight, buffer, marks, mol_roots);
 	}
-	buffer->atom_score[index] = totmpscore(weight, nhcon, bondcon, buffer->bond_matrix[index].size() - nhcon);
+	buffer->atom_score[index] = totmpscore(weight, nhcon, bondcon, (int)buffer->bond_matrix[index].size() - nhcon);
 	if (buffer->atom_score[index] > buffer->atom_score[mol_roots.back()])mol_roots.back() = index;
 }
 

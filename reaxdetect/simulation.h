@@ -3,8 +3,7 @@
 #ifndef SIMULATION_H
 #define SIMULATION_H
 
-
-#include "includes.h"
+#include <vector>
 
 // record arguments for a simulation
 struct Simulation {
@@ -13,7 +12,7 @@ struct Simulation {
 	int atomNumber;
 	double timeStep;
 	double volume;
-	vector<double> atomWeights;
+	std::vector<double> atomWeights;
 };
 
 

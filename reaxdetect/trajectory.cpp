@@ -1,7 +1,8 @@
-//read all kinds of TrajReader file
+
+#include "errors.h"
 #include "trajectory.h"
-#include "listhandler.h"
-#include "stringconvert.h"
+#include "util/algorithmutil.h"
+#include "util/strutil.h"
 
 #define DATA_LENGTH		24
 #define LINE_LENGTH		62
@@ -31,6 +32,7 @@ inline const Val& get(const map<Name, Val>& m, const Name& n, const Val& d) {
 int TrajReader::Open(const string& filename) {
 	trjfile.open(filename, ios_base::in);
 	if (!trjfile.is_open()) {
+        throw IOError(filename);
 		return 1;
 	}
 	else {

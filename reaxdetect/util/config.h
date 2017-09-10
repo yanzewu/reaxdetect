@@ -3,7 +3,8 @@
 #include <vector>
 #include <map>
 #include <string>
-#include "stringconvert.h"
+#include <fstream>
+#include "strutil.h"
 
 using namespace std;
 
@@ -16,6 +17,10 @@ public:
 	string& operator[](const string& itemName) {
 		return _items[itemName];
 	}
+
+    const string& at(const string& itemName)const {
+        return _items.at(itemName);
+    }
 
 	void read_data(const string& path) {
 		fstream file(path, ios_base::in);
@@ -47,7 +52,7 @@ public:
 		file.close();
 	}
 
-	const string& get(const string& name, const string& d) {
+	const string& get(const string& name, const string& d)const {
 		auto result = _items.find(name);
 		if (result == _items.end())return d;
 		else

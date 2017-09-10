@@ -1,6 +1,5 @@
-#include "includes.h"
-#include "filenamehandler.h"
-#include "stringconvert.h"
+
+#include "strutil.h"
 
 vector<string> split(const string& str, int num, char symbol) {
 	int cnt = 0;

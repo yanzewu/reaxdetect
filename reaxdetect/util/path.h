@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef PATH_H
+#define PATH_H
+
 #include <string>
 #include <vector>
 
@@ -10,3 +13,5 @@ namespace path {
 	string get_path(const string&);
 	vector<string> split(const string&);
 }
+
+#endif

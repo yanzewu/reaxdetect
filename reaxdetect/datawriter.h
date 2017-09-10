@@ -3,9 +3,9 @@
 #ifndef DATAWRITER_H
 #define DATAWRITER_H
 
+#include "analyzer.h"
 #include "simulation.h"
 #include "reaxreader.h"
-#include "analyzer.h"
 
 class ReaxDataWriter {
 public:

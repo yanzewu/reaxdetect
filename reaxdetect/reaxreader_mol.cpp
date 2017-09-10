@@ -1,5 +1,5 @@
 #include "reaxreader.h"
-#include "listhandler.h"
+#include "util/algorithmutil.h"
 
 int ReaxReader::totmpscore(int weight, int nhcon, int bond, int terminalh) {
 	return ((weight * maxnhcon + nhcon) * maxbond + bond) * maxhnum + terminalh;

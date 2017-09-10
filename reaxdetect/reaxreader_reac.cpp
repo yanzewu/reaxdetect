@@ -1,7 +1,9 @@
 #include <string>
+#include <algorithm>
+
 #include "reaxreader.h"
-#include "listhandler.h"
-#include "stringconvert.h"
+#include "util/algorithmutil.h"
+#include "util/strutil.h"
 
 bool ReaxReader::Reaction::check_valid()
 {

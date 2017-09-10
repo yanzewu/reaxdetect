@@ -1,7 +1,9 @@
 #include <math.h>
+#include <algorithm>
+
 #include "analyzer.h"
-#include "numarray.h"
-#include "elementname.h"
+#include "util/elements.h"
+#include "util/vecutil.h"
 
 void ReaxAnalyzer::HandleData(const ReaxReader& reader, const Simulation& simulation)
 {
@@ -113,7 +115,7 @@ void ReaxAnalyzer::CountReaction(const ReaxReader& rs)
 				product *= (fs - 1)->mol_freq[s];
 			sum_product_p[i] += product;
 
-			product = 1.0;
+			product = 1;
 			for (const auto& s : rs.reactions[i].products)
 				product *= (fs - 1)->mol_freq[s];
 			sum_product_m[i] += product;

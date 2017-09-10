@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef VECUTIL_H
+#define VECUTIL_H
+
 #include <vector>
 
 using namespace std;
@@ -133,4 +136,4 @@ void vread(ifstream& infile, vector<_Type>& v) {
 	infile.read((char*)&v[0], size * sizeof(_Type));
 }
 
-//void vwrite_str(char* buffer, const Array& a, char split=',');
+#endif

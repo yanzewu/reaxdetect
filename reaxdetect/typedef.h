@@ -1,13 +1,16 @@
 #pragma once
 
-#include "includes.h"
-
 #ifndef TYPEDEF_H
 #define TYPEDEF_H
 
+#include <vector>
+#include <utility>
+
+#define _ARRAY_TYPE
+
 typedef unsigned int tsize_t;
-typedef pair<int, int> diint;
-typedef vector<int> Array;
-typedef vector<double> Arrayd;
+typedef std::pair<int, int> diint;
+typedef std::vector<int> Array;
+typedef std::vector<double> Arrayd;
 
 #endif // !TYPEDEF_H

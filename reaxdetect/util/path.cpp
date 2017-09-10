@@ -1,5 +1,5 @@
-#include "filenamehandler.h"
-#include "stringconvert.h"
+
+#include "path.h"
 
 #ifdef __unix__
 #include <unistd.h>

@@ -1,8 +1,20 @@
 #pragma once
-#include "includes.h"
-#include "typedef.h"
 
 /* Contains templates for some quick operations */
+
+#ifndef ALGORITHMUTIL_H
+#define ALGORITHMUTIL_H
+
+#include <list>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+#ifndef _ARRAY_TYPE
+typedef vector<int> Array;
+#endif 
+
 
 //find if a data is in a vector, if not then push_back. also adds frequency
 template<typename type, typename container>
@@ -61,16 +73,6 @@ inline void sortby(list<type>& source, const Array& score, order pred) {
 	source.sort(_pred);
 }
 
-template<typename type, typename order>
-inline void sortby_pair(list<pair<type, type> >& source, const Array& score, order pred) {
-	if (source.empty())return;
-
-	auto _pred = [score, pred](auto x, auto y) {
-		return pred(score[x.first], score[y.first]);
-	};
-	source.sort(_pred);
-}
-
 //sort a index list by score. Pred means the order of head to tail.
 template<typename container, typename order>
 inline void sortby(container& source, const Array& score, order pred) {
@@ -80,6 +82,16 @@ inline void sortby(container& source, const Array& score, order pred) {
 		return pred(score[x], score[y]);
 	};
 	sort(source.begin(), source.end(), _pred);
+}
+
+template<typename type, typename order>
+inline void sortby_pair(list<pair<type, type> >& source, const Array& score, order pred) {
+	if (source.empty())return;
+
+	auto _pred = [score, pred](auto x, auto y) {
+		return pred(score[x.first], score[y.first]);
+	};
+	source.sort(_pred);
 }
 
 //rank by a exist rank
@@ -120,3 +132,5 @@ inline int floor_vec(const vector<T>& vec, const T& val) {
 	}
 	return i - 1;
 }
+
+#endif

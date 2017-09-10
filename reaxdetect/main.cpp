@@ -1,4 +1,4 @@
-#include"reaxdetect.h"
+#include "reaxdetect.h"
 
 int main(int argc, char** argv) {
 	ReaxDetect reaxdetect;

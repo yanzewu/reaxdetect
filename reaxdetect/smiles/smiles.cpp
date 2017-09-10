@@ -4,7 +4,7 @@
 #include <functional>
 #include <stdexcept>
 #include "smiles.h"
-#include "listhandler.h"
+#include "tablesort.h"
 #include "elementname.h"
 
 #define char2int(x) ((x) - 48)

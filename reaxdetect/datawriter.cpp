@@ -1,9 +1,9 @@
 
 #include "datawriter.h"
-#include "filenamehandler.h"
-#include "numarray.h"
-#include "stringconvert.h"
-#include "elementname.h"
+#include "errors.h"
+#include "util/elements.h"
+#include "util/path.h"
+#include "util/strutil.h"
 
 #define FILENAME_LENGTH 37
 #define EMPTY_BUFFER_COUNT	256
@@ -14,7 +14,8 @@ int ReaxDataWriter::Dump(const string& path, const string& path_reac, const Reax
 	FILE* outfile_c = fopen(path.c_str(), "w");
 	FILE* outfile_r = fopen(path_reac.c_str(), "w");
 
-	if (!outfile_c || !outfile_r)return 1;
+    if (!outfile_c)throw IOError(path);
+    if (!outfile_r)throw IOError(path_reac);
 
 	fprintf(outfile_c, "t,%s", join(reader.species).c_str());
 	fprintf(outfile_r, "t");
@@ -44,6 +45,8 @@ int ReaxDataWriter::Dump(const string& path, const string& path_reac, const Reax
 int ReaxDataWriter::WriteSample(const string& sample_path, const ReaxAnalyzer& analyzer)
 {
 	ofstream outfile(sample_path, ios_base::out);
+    if (!outfile.is_open()) throw IOError(sample_path);
+
 	outfile << "SPECIES\nt,";
 	outfile << join(analyzer.species) << "\n";
 	for (const auto& sample : analyzer.samples) {
@@ -71,7 +74,7 @@ int ReaxDataWriter::WriteReport(const string & path, const ReaxAnalyzer & analyz
 {
 	//ofstream outfile(path, ios_base::out);
 	FILE* outfile = fopen(path.c_str(), "w");
-	if (!outfile)return 1;
+    if (!outfile)throw IOError(path);
 
 	fprintf(outfile, "Molecules:\nindex,name,life(ps)\n");
 	for (size_t i = 0; i < analyzer.species.size(); i++) {
@@ -89,7 +92,7 @@ int ReaxDataWriter::WriteRawReactionFreq(const string & path, const ReaxAnalyzer
 {
 
 	FILE* outfile = fopen(path.c_str(), "w");
-	if (!outfile)return 1;
+    if (!outfile)throw IOError(path);
 
 	fprintf(outfile, "Reaction,Freq_pro,Base_pro,Freq_con,Base_con\n");
 	for (size_t i = 0; i < analyzer.reactions.size(); i++) {
@@ -103,6 +106,8 @@ int ReaxDataWriter::WriteRawReactionFreq(const string & path, const ReaxAnalyzer
 int ReaxDataWriter::WriteBondOrder(const string & path, const TrajReader & reader)
 {
 	ofstream outfile(path, ios_base::out);
+    if (!outfile.is_open()) throw IOError(path);
+
 	for (const auto& entry : reader.bondorders) {
 		outfile << WeightName[entry.first / MAX_ATOM_TYPE] << '-';
 		outfile << WeightName[entry.first % MAX_ATOM_TYPE];
@@ -119,6 +124,8 @@ int ReaxDataWriter::WriteBondOrder(const string & path, const TrajReader & reade
 int ReaxDataWriter::WriteConfig(const string & path, const Simulation & simulation, const ReaxReader& reader)
 {
 	ofstream outfile(path, ios_base::out);
+    if (!outfile)throw IOError(path);
+
 	outfile << "interval=" << reader.fss[1].t - reader.fss[0].t << "\n";
 	outfile << "volume=" << simulation.volume << "\n";
 	return 0;
