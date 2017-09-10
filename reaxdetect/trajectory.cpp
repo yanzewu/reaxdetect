@@ -1,4 +1,6 @@
 
+#include <string.h>
+
 #include "errors.h"
 #include "trajectory.h"
 #include "util/algorithmutil.h"

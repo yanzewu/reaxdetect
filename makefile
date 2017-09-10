@@ -1,5 +1,5 @@
 CXX = icc
-CXX_FLAGS = -O2 -std=c++14
+CXXFLAGS = -O2 -std=c++14
 EXEC = reaxdetect-dev
 VPATH = reaxdetect reaxdetect/util reaxdetect/smiles 
 OBJECTS = analyzer.o datawriter.o main.o reaxdetect.o reaxreader.o reaxreader_mol.o reaxreader_reac.o trajectory.o \
@@ -7,7 +7,7 @@ OBJECTS = analyzer.o datawriter.o main.o reaxdetect.o reaxreader.o reaxreader_mo
     path.o strutil.o
 
 $(EXEC): $(OBJECTS)
-	$(CXX) $(OBJECTS) -o $(EXEC)
+	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(EXEC)
 
 REAXREADER_H = reaxreader.h trajectory.h typedef.h smiles.h simulation.h 
 ANALYZER_H = analyzer.h $(REAXREADER_H)
