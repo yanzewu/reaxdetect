@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <iostream>
+#include <string.h>
 
 #include "reaxreader.h"
 #include "smiles/smiles.h"

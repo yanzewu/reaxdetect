@@ -16,7 +16,7 @@ const int primes[35] = {
 };
 
 const char bond_symbol[4] = {
-	'~', '-', '=', '@'
+	'~', '-', '*', '@'
 };
 
 inline int min(int a, int b) {
