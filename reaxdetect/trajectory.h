@@ -23,7 +23,7 @@ public:
 		vector<double> bondorder_cutoff_default;
 
 		int read_atompos;
-		bool count_bondorder;
+		int count_bondorder;
 		Config() : read_atompos(0) {
 		}
 	};
@@ -69,5 +69,6 @@ public:
 private:
 	Config config;
 	ifstream trjfile;
+	int frameCount;
 };
 #endif // !TRAJECTORY_H

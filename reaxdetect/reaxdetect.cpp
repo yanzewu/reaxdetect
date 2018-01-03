@@ -54,7 +54,7 @@ void ReaxDetect::translate_opt()
 {
 	config_traj = TrajReader::Config();
 	config_traj.read_atompos = stob(cfg_reader.at("ReadAtomPos"));
-	config_traj.count_bondorder = stob(cfg_reader.at("CountBondOrder"));
+	config_traj.count_bondorder = stoi(cfg_reader.at("CountBondOrder"));
 	for (const auto& c : split(cfg_reader.at("BondOrderCutoffDefault"), -1, ',')) {
 		config_traj.bondorder_cutoff_default.push_back(stod(c));
 	}
@@ -96,7 +96,7 @@ int ReaxDetect::exec() {
         writer.Dump(input_name + "_full_dump.csv", input_name + "_full_reac.csv", reader);
 	}
 	writer.WriteConfig(input_name + "_config.txt", simulation, reader);
-	if (cfg_reader.get("CountBondOrder", "false") == "true") {
+	if (cfg_reader.get("CountBondOrder", "0") != "0") {
 		writer.WriteBondOrder(input_name + "_bondorder.csv", traj);
 	}
 	if (write_option.write_kineticfile) {
@@ -208,7 +208,7 @@ void ReaxDetect::set_default_opt()
 {
 	cfg_reader["BondOrderCutoff"] = "default";
 	cfg_reader["BondOrderCutoffDefault"] = "0.5,0.5";
-	cfg_reader["CountBondOrder"] = "false";
+	cfg_reader["CountBondOrder"] = "0";
 	cfg_reader["FrameBufferSize"] = "2";
 	cfg_reader["ReadAtomPos"] = "false";
 	cfg_reader["RecognizeBegin"] = "0";

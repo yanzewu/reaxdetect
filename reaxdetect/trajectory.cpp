@@ -88,6 +88,7 @@ int TrajReader::ReadTrjHead(Simulation* simulation) {
 	for (const auto& boc : config.bondorder_cutoff) {
 		printf("%d-%d=%s\n", boc.first / MAX_ATOM_TYPE, boc.first % MAX_ATOM_TYPE, join(boc.second).c_str());
 	}
+	frameCount = 0;
 	return 0;
 }
 
@@ -135,9 +136,10 @@ int TrajReader::ReadTrjFrame(Frame& frameOut) {
 		if (crtBond.order >= 0) {
 			frameOut.bonds.push_back(crtBond);
 		}
-		if (config.count_bondorder) {
+		if (config.count_bondorder && frameCount % config.count_bondorder == 0) {
 			bondorders[bond_identifier].push_back(raw_order);
 		}
 	}
+	frameCount++;
 	return 1;
 }
