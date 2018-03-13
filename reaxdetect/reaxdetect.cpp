@@ -101,6 +101,7 @@ int ReaxDetect::exec() {
 	}
 	if (write_option.write_kineticfile) {
 		printf("Analysing Kinetic Results...\n");
+		simulation.timeStep *= config_reax.recognize_interval;
 		ReaxAnalyzer analyzer(config_analyzer);
 		analyzer.HandleData(reader, simulation);
 		writer.WriteReport(input_name + "_full_report.csv", analyzer);
