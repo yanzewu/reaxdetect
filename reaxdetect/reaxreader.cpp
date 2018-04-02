@@ -26,28 +26,63 @@ int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 	InitBuffer(simulation.atomNumber + 1);
 	TrajReader::Frame _frame;
 	size_t i = 0;
-	size_t buffer_i = 0;
+	size_t frame_i = 0;
 	while (reader.ReadTrjFrame(_frame)) {
 		if (i % config.recognize_interval == 0 && i >= config.recognize_begin) {
 			FrameStat fstat;
 			fstat.t = simulation.timeStep * i;
 			RecognizeMolecule(_frame, reader.atomWeights, simulation.atomNumber, fstat);
-			RecognizeReaction(_frame);
-			fss.push_back(fstat);
-			if (buffer_i >= config.buffer_size - 1) {
-				CommitReaction(fss[buffer_i - config.buffer_size + 1]);
+
+			// fast return: First frame
+			if (frame_i == 0) {
+				SwapBuffer();
+				fss.push_back(fstat);
+				frame_i++;
+				break;
 			}
+			RecognizeReaction(_frame);
+			i++;
+
+			// mark last buffer as clean; At this time prevbuffer should have only one item
+			_prev_buffer.front()->dirty = false;
+			_prev_buffer.clear();
+
+			for (size_t j = 0; j < config.buffer_size - 2; j++) {
+				for (int k = 0; k < config.buffer_interval; k++) {
+					if (!reader.ReadTrjFrame(_frame))goto recend;
+					i++;
+				}
+
+				SwapBuffer();
+
+				FrameStat fstat_tmp;
+				RecognizeMolecule(_frame, reader.atomWeights, simulation.atomNumber, fstat_tmp);
+				RecognizeReaction(_frame);
+			}
+
+			CommitReaction(fstat);
+			fss.push_back(fstat);
+
+			// mark those bs-2 buffers as clean
+			while (_prev_buffer.size() > 1) {
+				_prev_buffer.front()->dirty = false;
+				_prev_buffer.pop_front();
+			}
+
+			// load a new buffer; push last into prevbuffer
 			SwapBuffer();
-			buffer_i++;
+			// however last is useless
+			_prev_buffer.front()->dirty = false;
+			_prev_buffer.pop_front();
 		}
-		i++;
+
 		if (i == config.recognize_limit) {
 			break;
 		}
 	}
-	for (size_t j = buffer_i - config.buffer_size + 1; j < buffer_i; j++) {
-		CommitReaction(fss[j]);
-	}
+
+recend:
+
 	printf("Total %zd frames read, with %zd molecules and %zd reactions.\n", fss.size(), molecules.size(), reactions.size());
 
 	printf("Encoding smiles...\n");
@@ -87,12 +122,23 @@ void ReaxReader::SwapBuffer() {
 		_prev_buffer.pop_back();
 	}
 	_prev_buffer.push_front(_crt_buffer);
-	_crt_buffer = _buffer_pages + (_crt_buffer + 1 - _buffer_pages) % config.buffer_size;
+	
+	auto b = _buffer_pages;
+	for (; b < _buffer_pages + config.buffer_size; b++) {
+		if (!b->dirty) {
+			_crt_buffer = b;
+			break;
+		}
+	}
+	if (b == _buffer_pages + config.buffer_size) {
+		throw runtime_error("No clean buffer");
+	}
 
 	_crt_buffer->molecule.clear();
 	_crt_buffer->mol_idx.clear();
 	_crt_buffer->raw_reaction.clear();
 	_crt_buffer->reaction.clear();
+	_crt_buffer->dirty = true;
 
 	for (auto& m : _crt_buffer->mol_of_atom)
 		m = -1;

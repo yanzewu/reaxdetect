@@ -65,6 +65,7 @@ void ReaxDetect::translate_opt()
 
     config_reax = ReaxReader::Config();
 	config_reax.buffer_size = stoul(cfg_reader.at("FrameBufferSize"));
+	config_reax.buffer_interval = stoi(cfg_reader.at("FrameBufferInterval"));
 	config_reax.recognize_interval = stoi(cfg_reader.at("RecognizeInterval"));
 	config_reax.recognize_limit = stoi(cfg_reader.at("RecognizeLimit"));
 	config_reax.recognize_begin = stoi(cfg_reader.at("RecognizeBegin"));
@@ -211,6 +212,7 @@ void ReaxDetect::set_default_opt()
 	cfg_reader["BondOrderCutoffDefault"] = "0.5,0.5";
 	cfg_reader["CountBondOrder"] = "0";
 	cfg_reader["FrameBufferSize"] = "2";
+	cfg_reader["FrameBufferInterval"] = "1";
 	cfg_reader["ReadAtomPos"] = "false";
 	cfg_reader["RecognizeBegin"] = "0";
 	cfg_reader["RecognizeInterval"] = "1";

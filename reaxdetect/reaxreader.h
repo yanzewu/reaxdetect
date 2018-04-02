@@ -26,6 +26,7 @@ public:
 
 	struct Config {
 		size_t buffer_size;
+		int buffer_interval;
 		int recognize_interval;
 		int recognize_limit;
 		int recognize_begin;
@@ -91,6 +92,7 @@ protected:
 
 
 	struct BufferPage {
+		bool dirty;
 		Array mol_idx;	//map of relative index to absolute index	
 		vector<MatMolecule> molecule;		//molecule buffer
 		vector<Reaction> raw_reaction;	// reaction buffer for raw reactions
@@ -98,6 +100,8 @@ protected:
 		Array mol_of_atom;		//map of atom to the molecule who contains it	
 		Array atom_score;	//raw data from the bond in one frame	
 		Matrix bond_matrix;			//atom score buffer in one frame
+
+		BufferPage() : dirty(false){}
 	};
 
 	Config config;
