@@ -38,18 +38,15 @@ int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 				SwapBuffer();
 				fss.push_back(fstat);
 				frame_i++;
-				break;
+				i++;
+                continue;
 			}
 			RecognizeReaction(_frame);
 			i++;
 
-			// mark last buffer as clean; At this time prevbuffer should have only one item
-			_prev_buffer.front()->dirty = false;
-			_prev_buffer.clear();
-
 			for (size_t j = 0; j < config.buffer_size - 2; j++) {
 				for (int k = 0; k < config.buffer_interval; k++) {
-					if (!reader.ReadTrjFrame(_frame))goto recend;
+					if (reader.ReadTrjFrame(_frame) == 0)goto recend;
 					i++;
 				}
 
@@ -60,8 +57,12 @@ int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 				RecognizeReaction(_frame);
 			}
 
-			CommitReaction(fstat);
-			fss.push_back(fstat);
+			// pop last buffer, which is useless by now
+			_prev_buffer.back()->dirty = false;
+			_prev_buffer.pop_back();
+
+			// load a new buffer; push last into prevbuffer
+			SwapBuffer();
 
 			// mark those bs-2 buffers as clean
 			while (_prev_buffer.size() > 1) {
@@ -69,12 +70,15 @@ int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 				_prev_buffer.pop_front();
 			}
 
-			// load a new buffer; push last into prevbuffer
-			SwapBuffer();
-			// however last is useless
-			_prev_buffer.front()->dirty = false;
-			_prev_buffer.pop_front();
+			// there should have left only one buffer now (current buffer)
+
+			CommitReaction(fstat);
+			fss.push_back(fstat);
+
 		}
+        else{
+            i++;
+        }
 
 		if (i == config.recognize_limit) {
 			break;
@@ -110,6 +114,7 @@ void ReaxReader::InitBuffer(size_t max_atom_idx)
 {
 	_prev_buffer.clear();
 	_crt_buffer = &_buffer_pages[0];
+	_crt_buffer->dirty = true;
 	for (BufferPage* page = _buffer_pages; page != _buffer_pages + config.buffer_size; page++) {
 		page->mol_of_atom.assign(max_atom_idx, -1);
 		page->bond_matrix.resize(max_atom_idx);
@@ -118,9 +123,9 @@ void ReaxReader::InitBuffer(size_t max_atom_idx)
 }
 
 void ReaxReader::SwapBuffer() {
-	if (_prev_buffer.size() >= config.buffer_size - 1) {
+/*	if (_prev_buffer.size() >= config.buffer_size - 1) {
 		_prev_buffer.pop_back();
-	}
+	}*/
 	_prev_buffer.push_front(_crt_buffer);
 	
 	auto b = _buffer_pages;
