@@ -46,7 +46,7 @@ private:
 
 	Simulation simulation;
 	ConfigReader cfg_reader;
-	TrajReader::Config config_traj;
+	ReaxTrajReader::Config config_traj;
 	ReaxReader::Config config_reax;
 
 	string input_path;

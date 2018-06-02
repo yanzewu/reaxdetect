@@ -1,13 +1,17 @@
-#include <math.h>
-#include <algorithm>
 
 #include "analyzer.h"
 #include "util/elements.h"
 #include "util/vecutil.h"
 
+#include <algorithm>
+#include <map>
+#include <set>
+#include <math.h>
+
+
 void ReaxAnalyzer::HandleData(const ReaxReader& reader, const Simulation& simulation)
 {
-	for (const auto& e : simulation.atomWeights) {
+	for (const auto& e : std::set<double>(simulation.atomWeights.begin() + 1, simulation.atomWeights.end())) {
 		elements.push_back(WeightNameL.at((int)(e + 0.1)));
 	}
 	printf("Elements are:");

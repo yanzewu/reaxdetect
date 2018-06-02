@@ -48,7 +48,7 @@ int ReaxDetect::init(int argc, char** argv) {
 
 void ReaxDetect::translate_opt()
 {
-	config_traj = TrajReader::Config();
+	config_traj = ReaxTrajReader::Config();
 	config_traj.read_atompos = stob(cfg_reader.at("ReadAtomPos"));
 	config_traj.count_bondorder = stoi(cfg_reader.at("CountBondOrder"));
 	for (const auto& c : split(cfg_reader.at("BondOrderCutoffDefault"), -1, ',')) {
@@ -72,22 +72,23 @@ int ReaxDetect::exec() {
 	ReaxDataWriter writer;
 	ReaxReader reader(config_reax);
 
-	TrajReader traj(config_traj);
+	ReaxTrajReader traj(config_traj);   // change it to your own reader here
     traj.Open(input_path);
-    traj.ReadTrjHead(&simulation);
+    traj.ReadTrjHead(&simulation);  // read necessary metadata
 
 	printf("Reading Frames...\n");
-	reader.HandleData(traj, simulation);
+	reader.HandleData(traj, simulation);    // main read loop & handle
 
 	printf("Writing raw results...\n");
-    writer.Dump(input_name + "_full_dump.csv", input_name + "_full_reac.csv", reader);
+    writer.Dump(input_name + "_full_dump.csv", input_name + "_full_reac.csv", reader);  // species/reaction rates
 
-	writer.WriteConfig(input_name + "_config.txt", simulation, reader);
-	if (cfg_reader.get("CountBondOrder", "0") != "0") {
+	writer.WriteConfig(input_name + "_config.txt", simulation, reader); // additional information (t. V)
+
+	if (cfg_reader.get("CountBondOrder", "0") != "0") {     // Use when writing PDF of bond order
 		writer.WriteBondOrder(input_name + "_bondorder.csv", traj);
 	}
 	printf("Analysing Kinetic Results...\n");
-	simulation.timeStep *= config_reax.recognize_interval;
+	simulation.timeStep *= config_reax.recognize_interval;  // Scale time for correctly calculating lifetime
 
 	ReaxAnalyzer analyzer;
 	analyzer.HandleData(reader, simulation);

@@ -15,7 +15,7 @@ public:
 
 	static int WriteReport(const string& path, const ReaxAnalyzer&);
 
-	static int WriteBondOrder(const string& path, const TrajReader&);
+	static int WriteBondOrder(const string& path, const ReaxTrajReader&);
 
 	static int WriteConfig(const string & path, const Simulation&, const ReaxReader&);
 };

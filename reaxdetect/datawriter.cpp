@@ -60,7 +60,7 @@ int ReaxDataWriter::WriteReport(const string & path, const ReaxAnalyzer & analyz
 	return 0;
 }
 
-int ReaxDataWriter::WriteBondOrder(const string & path, const TrajReader & reader)
+int ReaxDataWriter::WriteBondOrder(const string & path, const ReaxTrajReader & reader)
 {
 	ofstream outfile(path, ios_base::out);
     if (!outfile.is_open()) throw IOError(path);

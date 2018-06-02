@@ -107,16 +107,13 @@ protected:
 	list<BufferPage*> _prev_buffer;	//buffer index
 
 	//detect molecule and write crtmol, crtfmi, fss.molfreq
-	void RecognizeMolecule(const TrajReader::Frame& frm, const Arrayd& atomWeights, int atomNumber, FrameStat& fs);
+	void RecognizeMolecule(const TrajFrame& frm, const Arrayd& atomWeights, int atomNumber, FrameStat& fs);
 
 	//detect reaction and write fss.reactions
-	void RecognizeReaction(const TrajReader::Frame& frm);
+	void RecognizeReaction(const TrajFrame& frm);
 	
 	//commit reaction into lists
 	void CommitReaction(FrameStat& fs_commit);
-
-	//count bond order for different types
-	void CountBondOrder(const TrajReader::Frame& frm, const Arrayd& atomWeights);
 
 	//initialize buffer pages
 	void InitBuffer(size_t max_atom_idx);

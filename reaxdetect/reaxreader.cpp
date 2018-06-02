@@ -24,14 +24,14 @@ int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 	_buffer_pages = new BufferPage[config.buffer_size];
 
 	InitBuffer(simulation.atomNumber + 1);
-	TrajReader::Frame _frame;
+    TrajFrame _frame;
 	size_t i = 0;
 	size_t buffer_i = 0;
-	while (reader.ReadTrjFrame(_frame)) {
+	while (reader.ReadTrjFrame(_frame, simulation)) {
 		if (i % config.recognize_interval == 0 && i >= config.recognize_begin) {
 			FrameStat fstat;
 			fstat.t = simulation.timeStep * i;
-			RecognizeMolecule(_frame, reader.atomWeights, simulation.atomNumber, fstat);
+			RecognizeMolecule(_frame, simulation.atomWeights, simulation.atomNumber, fstat);
 			RecognizeReaction(_frame);
 			fss.push_back(fstat);
 			if (buffer_i >= config.buffer_size - 1) {
@@ -44,6 +44,7 @@ int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 		if (i == config.recognize_limit) {
 			break;
 		}
+        _frame.clear();
 	}
 	for (size_t j = buffer_i - config.buffer_size + 1; j < buffer_i; j++) {
 		CommitReaction(fss[j]);
@@ -101,7 +102,7 @@ void ReaxReader::SwapBuffer() {
 	for (auto& b : _crt_buffer->bond_matrix)
 		b.clear();
 }
-void ReaxReader::RecognizeMolecule(const TrajReader::Frame& frm, const Arrayd& atomWeights, int atomNumber, FrameStat& fs)
+void ReaxReader::RecognizeMolecule(const TrajFrame& frm, const Arrayd& atomWeights, int atomNumber, FrameStat& fs)
 {
 	for (const auto& bnd : frm.bonds) {
 		_crt_buffer->bond_matrix[bnd.id_1].push_back({ bnd.id_2, bnd.order });
@@ -161,7 +162,7 @@ void ReaxReader::RecognizeMolecule(const TrajReader::Frame& frm, const Arrayd& a
 		molindex = uindex[molindex];
 	}
 }
-void ReaxReader::RecognizeReaction(const TrajReader::Frame& frm)
+void ReaxReader::RecognizeReaction(const TrajFrame& frm)
 {
 	if (_prev_buffer.empty())return;
 

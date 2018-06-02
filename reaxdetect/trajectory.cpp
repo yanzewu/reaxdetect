@@ -31,7 +31,7 @@ inline const Val& get(const map<Name, Val>& m, const Name& n, const Val& d) {
 }
 
 
-int TrajReader::Open(const string& filename) {
+int ReaxTrajReader::Open(const string& filename) {
 	trjfile.open(filename, ios_base::in);
 	if (!trjfile.is_open()) {
         throw IOError(filename);
@@ -42,13 +42,13 @@ int TrajReader::Open(const string& filename) {
 	}
 }
 
-int TrajReader::ReadTrjHead(Simulation* simulation) {
+int ReaxTrajReader::ReadTrjHead(Simulation* simulation) {
 
 	//read file head
 	char buffer[LINE_LENGTH];
 	int traj_length;
 	trjfile >> buffer >> traj_length;
-	trjfile >> buffer >> simulation->name;
+	trjfile >> buffer >> buffer;
 	trjfile >> buffer >> simulation->atomNumber;
 	trjfile.seekg(2 * LINE_LENGTH, ios_base::cur);
 
@@ -60,7 +60,6 @@ int TrajReader::ReadTrjHead(Simulation* simulation) {
 		trjfile >> buffer >> buffer;
 	}
 
-	printf("Name: %s\n", simulation->name);
 	printf("Atom numbers: %d\n", simulation->atomNumber);
 	printf("Time step: %.2e ps\n", simulation->timeStep);
 
@@ -68,19 +67,11 @@ int TrajReader::ReadTrjHead(Simulation* simulation) {
 	//read atom type
 	trjfile.seekg(2 * LINE_LENGTH, ios_base::cur);
 
-	atomTypes.resize(simulation->atomNumber + 1);
-	atomWeights.resize(simulation->atomNumber + 1);
+	simulation->atomWeights.resize(simulation->atomNumber + 1);
 	for (int i = 0; i < simulation->atomNumber; i++) {
 		int atomIndex, atomType; double atomWeight;
 		trjfile >> atomIndex >> atomType >> atomWeight;
-		atomTypes[atomIndex] = atomType;
-		atomWeights[atomIndex] = atomWeight;
-	}
-
-	//record atom types
-	for (auto w = atomWeights.begin() + 1; w != atomWeights.end(); w++) {
-		if (find(simulation->atomWeights.begin(), simulation->atomWeights.end(), *w) == simulation->atomWeights.end())
-			simulation->atomWeights.push_back(*w);
+		simulation->atomWeights[atomIndex] = atomWeight;
 	}
 
 	printf("Count bondorder=%s\n", config.count_bondorder ? "true" : "false");
@@ -92,7 +83,7 @@ int TrajReader::ReadTrjHead(Simulation* simulation) {
 	return 0;
 }
 
-int TrajReader::ReadTrjFrame(Frame& frameOut) {
+int ReaxTrajReader::ReadTrjFrame(TrajFrame& frameOut, const Simulation& simulation) {
 	if (trjfile.peek() == EOF)return 0;
 	
 	int frameHeadLength;
@@ -108,14 +99,14 @@ int TrajReader::ReadTrjFrame(Frame& frameOut) {
 
 	if (config.read_atompos) {
 		frameOut.atoms.clear();
-		for (int i = 0; i < atomTypes.size() - 1; i++) {
+		for (int i = 0; i < simulation.atomNumber; i++) {
 			atom crtAtom; double q;
 			trjfile >> crtAtom.id >> crtAtom.x >> crtAtom.y >> crtAtom.z >> q;
 			frameOut.atoms.push_back(crtAtom);
 		}
 	}
 	else {
-		for (int i = 0; i < atomTypes.size() - 1; i++) {
+		for (int i = 0; i < simulation.atomNumber; i++) {
 			trjfile.getline(buffer, LINE_LENGTH, '\n');
 		}
 	}
@@ -128,7 +119,7 @@ int TrajReader::ReadTrjFrame(Frame& frameOut) {
 		bond crtBond; double length, raw_order;
 		trjfile >> crtBond.id_1 >> crtBond.id_2 >> length >> raw_order;
 
-		int type1 = int(atomWeights[crtBond.id_1] + 0.1), type2 = int(atomWeights[crtBond.id_2] + 0.1);
+		int type1 = int(simulation.atomWeights[crtBond.id_1] + 0.1), type2 = int(simulation.atomWeights[crtBond.id_2] + 0.1);
 		int bond_identifier = type1 > type2 ? (type1 * MAX_ATOM_TYPE + type2) : (type2 * MAX_ATOM_TYPE + type1);
 
 		crtBond.order = floor_vec(get(config.bondorder_cutoff, bond_identifier, config.bondorder_cutoff_default), raw_order);

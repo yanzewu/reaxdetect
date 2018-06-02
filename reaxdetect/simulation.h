@@ -5,14 +5,13 @@
 
 #include <vector>
 
-// record arguments for a simulation
+    // Metadata of simulation (either read / input by user)
 struct Simulation {
-	char name[37];
-	double temp;
-	int atomNumber;
-	double timeStep;
-	double volume;
-	std::vector<double> atomWeights;
+	double temp;        // Temperature
+	int atomNumber;     // Number of atoms
+	double timeStep;    // Frame timestep
+	double volume;      // Volume
+	std::vector<double> atomWeights;    // atom Weight List (index=>weight)
 };
 
 
