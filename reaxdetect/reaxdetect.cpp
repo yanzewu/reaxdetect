@@ -31,10 +31,6 @@ int ReaxDetect::init(int argc, char** argv) {
 	set_default_opt();
 	cfg_reader.read_data(path::split(argv[0])[0] + default_config_path);
 
-	write_option.write_fulldata = 1;
-	write_option.write_kineticfile = 1;
-	write_option.write_rawdata = 1;
-
 	simulation.timeStep = 0.0;
 	simulation.volume = 1.0;
 
@@ -68,14 +64,6 @@ void ReaxDetect::translate_opt()
 	config_reax.recognize_interval = stoi(cfg_reader.at("RecognizeInterval"));
 	config_reax.recognize_limit = stoi(cfg_reader.at("RecognizeLimit"));
 	config_reax.recognize_begin = stoi(cfg_reader.at("RecognizeBegin"));
-
-	config_analyzer = ReaxAnalyzer::Config();
-	string sample_method_str = cfg_reader.at("SampleMethod");
-	if (sample_method_str == "fixint") {
-		config_analyzer.sample_method = SAMPLE_FIXINT;
-	}
-	config_analyzer.sample_int = stod(cfg_reader.at("SampleInterval"));
-	config_analyzer.sample_range = stod(cfg_reader.at("SampleRange"));
 }
 
 int ReaxDetect::exec() {
@@ -92,23 +80,20 @@ int ReaxDetect::exec() {
 	reader.HandleData(traj, simulation);
 
 	printf("Writing raw results...\n");
-	if (write_option.write_fulldata) {
-        writer.Dump(input_name + "_full_dump.csv", input_name + "_full_reac.csv", reader);
-	}
+    writer.Dump(input_name + "_full_dump.csv", input_name + "_full_reac.csv", reader);
+
 	writer.WriteConfig(input_name + "_config.txt", simulation, reader);
 	if (cfg_reader.get("CountBondOrder", "0") != "0") {
 		writer.WriteBondOrder(input_name + "_bondorder.csv", traj);
 	}
-	if (write_option.write_kineticfile) {
-		printf("Analysing Kinetic Results...\n");
-		simulation.timeStep *= config_reax.recognize_interval;
-		ReaxAnalyzer analyzer(config_analyzer);
-		analyzer.HandleData(reader, simulation);
-		writer.WriteReport(input_name + "_full_report.csv", analyzer);
-		writer.WriteRawReactionFreq(input_name + "_rawfreq.csv", analyzer);
-        writer.WriteSample(input_name + "_sample.csv", analyzer);
-	}
-	printf("Finished Successfully.\n");
+	printf("Analysing Kinetic Results...\n");
+	simulation.timeStep *= config_reax.recognize_interval;
+
+	ReaxAnalyzer analyzer;
+	analyzer.HandleData(reader, simulation);
+	writer.WriteReport(input_name + "_full_report.csv", analyzer);
+	
+    printf("Finished Successfully.\n");
 	return 0;
 }
 
@@ -133,7 +118,6 @@ int ReaxDetect::read_boc(const string & filename, map<int, Arrayd>& bondorder_cu
 int ReaxDetect::read_opt(int argc, char** argv) {
 	const option longOpts[] = {
 		{ "config", no_argument, NULL, 0},
-		{ "dump", required_argument, NULL, 0},
 		{ "help", no_argument, NULL, 'h' },
 		{ "version", no_argument, NULL, 0 },
 		{ "", 0, 0, 0}
@@ -179,16 +163,6 @@ int ReaxDetect::read_opt(int argc, char** argv) {
 			if (string(longOpts[longIndex].name) == "version") {
 				display_version();
                 exit(0);
-			}
-			else if (string(longOpts[longIndex].name) == "dump") {
-				if (string(optarg) == "nodump") {
-					write_option.write_fulldata = 0;
-					write_option.write_rawdata = 0;
-				}
-				else if (string(optarg) == "full") {
-					write_option.write_fulldata = 2;
-					write_option.write_rawdata = 2;
-				}
 			}
             // write config file only
 			else if (string(longOpts[longIndex].name) == "config") {

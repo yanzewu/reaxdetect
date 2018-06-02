@@ -46,7 +46,6 @@ private:
 
 	Simulation simulation;
 	ConfigReader cfg_reader;
-	ReaxAnalyzer::Config config_analyzer;
 	TrajReader::Config config_traj;
 	ReaxReader::Config config_reax;
 
@@ -56,20 +55,6 @@ private:
 
 	const string default_config_path = "reacdetect.ini";
 
-	// options inside this program
-
-	int read_line;
-
-	enum {
-		TRAJECTORY_FILE, RAWDATA_FILE
-	} file_type;
-
-	typedef struct {
-		char write_rawdata;
-		char write_fulldata;
-		char write_kineticfile;
-	} WriteOption;
-	WriteOption write_option;
 };
 
 #endif // !REAXDETECT_H

@@ -42,34 +42,6 @@ int ReaxDataWriter::Dump(const string& path, const string& path_reac, const Reax
 	return 0;
 }
 
-int ReaxDataWriter::WriteSample(const string& sample_path, const ReaxAnalyzer& analyzer)
-{
-	ofstream outfile(sample_path, ios_base::out);
-    if (!outfile.is_open()) throw IOError(sample_path);
-
-	outfile << "SPECIES\nt,";
-	outfile << join(analyzer.species) << "\n";
-	for (const auto& sample : analyzer.samples) {
-		outfile << sample.t;
-		for (const auto& c_ : sample.c) outfile << "," << c_;
-		outfile << "\n";
-	}
-	outfile << "END\nREACTIONS\nt,";
-	outfile << join(analyzer.reactions) << "\n";
-	for (const auto& sample : analyzer.samples) {
-		outfile << sample.t;
-		for (const auto& r_ : sample.r) outfile << "," << r_;
-		outfile << "\n";
-	}
-	outfile << "END\nINIT\n";
-	for (const auto& i : analyzer.init) {
-		outfile << i.first << "," << i.second << "\n";
-	}
-	outfile << "END";
-	outfile.close();
-	return 0;
-}
-
 int ReaxDataWriter::WriteReport(const string & path, const ReaxAnalyzer & analyzer)
 {
 	//ofstream outfile(path, ios_base::out);
@@ -83,21 +55,6 @@ int ReaxDataWriter::WriteReport(const string & path, const ReaxAnalyzer & analyz
 	fprintf(outfile, "Reactions\nindex,reaction,freqplus,freqminus\n");
 	for (size_t i = 0; i < analyzer.reactions.size(); i++) {
 		fprintf(outfile, "%zd,%s,%d,%d\n", i, analyzer.reactions[i].c_str(), analyzer.rp[i], analyzer.rm[i]);
-	}
-	fclose(outfile);
-	return 0;
-}
-
-int ReaxDataWriter::WriteRawReactionFreq(const string & path, const ReaxAnalyzer & analyzer)
-{
-
-	FILE* outfile = fopen(path.c_str(), "w");
-    if (!outfile)throw IOError(path);
-
-	fprintf(outfile, "Reaction,Freq_pro,Base_pro,Freq_con,Base_con\n");
-	for (size_t i = 0; i < analyzer.reactions.size(); i++) {
-		fprintf(outfile, "%s,%d,%u,%d,%u\n", 
-			analyzer.reactions[i].c_str(), analyzer.rp[i], analyzer.sum_product_p[i], analyzer.rm[i], analyzer.sum_product_m[i]);
 	}
 	fclose(outfile);
 	return 0;

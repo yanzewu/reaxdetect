@@ -15,6 +15,8 @@ void ReaxAnalyzer::HandleData(const ReaxReader& reader, const Simulation& simula
 		printf(" %s", e.c_str());
 	}
 
+    std::map<std::string, double> init;
+
 	for (int i = 0; i < reader.species.size(); i++) {
 		if (reader.fss[0].mol_freq[i] == 0)break;
 		init[reader.species[i]] = reader.fss[0].mol_freq[i] / simulation.volume;
@@ -38,24 +40,6 @@ void ReaxAnalyzer::HandleData(const ReaxReader& reader, const Simulation& simula
 	printf("Calculating reaction product...\n");
 	double interval = reader.fss[1].t - reader.fss[0].t;
 	printf("Interval: %.3e\n", interval);
-	CountReaction(reader);
-
-	printf("Sampling...\n");
-	if (config.sample_method == SAMPLE_FIXINT) {
-		tsize_t sample_int = (tsize_t)(config.sample_int / interval);
-		tsize_t sample_range = (tsize_t)(config.sample_range / interval);
-
-		printf("Using fixed sample with interval %f(%d), range %f(%d)\n", config.sample_int, sample_int, config.sample_range, sample_range);
-		FixSample(reader, sample_int, sample_range, interval, simulation.volume);
-	}
-	else {
-		printf("Unknown sample method\n");
-	}
-}
-
-void ReaxAnalyzer::set_config(const Config & c)
-{
-	config = c;
 }
 
 void ReaxAnalyzer::CalcMolLife(const ReaxReader& rs, double timeStep)
@@ -94,54 +78,4 @@ void ReaxAnalyzer::CalcMolLife(const ReaxReader& rs, double timeStep)
 		if (inflow[i] > 0)species_life[i] = timeStep * c_integral[i] / inflow[i];
 		else printf("Warning: inflow calc error: %zd\n", i);
 	}
-}
-
-void ReaxAnalyzer::CountReaction(const ReaxReader& rs)
-{
-	//version 2: confidence interval.
-	using namespace veccal;
-
-	//get frequency distribution
-	auto size = rs.species.size();
-	auto rsize = rs.reactions.size();
-
-	sum_product_p.resize(rsize, 0);
-	sum_product_m.resize(rsize, 0);
-	for (auto fs = rs.fss.begin() + 1; fs < rs.fss.end(); fs++) {
-
-		for (size_t i = 0; i < rsize; i++) {
-			unsigned int product = 1;
-			for (const auto& s : rs.reactions[i].reagants)
-				product *= (fs - 1)->mol_freq[s];
-			sum_product_p[i] += product;
-
-			product = 1;
-			for (const auto& s : rs.reactions[i].products)
-				product *= (fs - 1)->mol_freq[s];
-			sum_product_m[i] += product;
-
-		}
-	}
-}
-
-void ReaxAnalyzer::FixSample(const ReaxReader & reader, tsize_t sample_int, tsize_t range, double interval, double volume)
-{
-	using namespace veccal;
-
-	for (size_t i = 0; i < reader.fss.size() - range; i += sample_int) {
-		Array sum_c(reader.molecules.size(), 0), sum_r(reader.reactions.size(), 0);
-
-		size_t crt_range = min((size_t)range, reader.fss.size() - i);
-
-		for (size_t j = 0; j < crt_range; j++) {
-			sum_c += reader.fss[i + j].mol_freq;
-			sum_r += net(reader.fss[i + j].reaction_freq);
-		}
-		Sample sample;
-		mul_into(sum_c, 1 / (double)(crt_range * volume), sample.c);
-		mul_into(sum_r, 1 / (double)(crt_range * interval * volume), sample.r);
-		sample.t = interval*(i + crt_range / 2);
-		samples.push_back(sample);
-	}
-
 }
