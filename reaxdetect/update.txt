@@ -1,5 +1,0 @@
-## Log of updates
-
-# version 3.0.0-beta [first compiled in 2017/3/9]
-1. Create a new environment;
-

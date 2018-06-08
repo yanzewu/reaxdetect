@@ -137,9 +137,11 @@
     <ClInclude Include="trajectory.h" />
     <ClInclude Include="typedef.h" />
     <ClInclude Include="util\algorithmutil.h" />
+    <ClInclude Include="util\argparse.h" />
     <ClInclude Include="util\config.h" />
     <ClInclude Include="util\elements.h" />
     <ClInclude Include="util\path.h" />
+    <ClInclude Include="util\serialize.h" />
     <ClInclude Include="util\strutil.h" />
     <ClInclude Include="util\vecutil.h" />
   </ItemGroup>
@@ -155,9 +157,6 @@
     <ClCompile Include="trajectory.cpp" />
     <ClCompile Include="util\path.cpp" />
     <ClCompile Include="util\strutil.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="update.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\makefile" />

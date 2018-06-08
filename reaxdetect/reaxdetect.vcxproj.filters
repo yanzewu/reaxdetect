@@ -19,6 +19,9 @@
     <Filter Include="smiles">
       <UniqueIdentifier>{6523d7b2-c716-45b9-8170-db703009e76a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="util\external">
+      <UniqueIdentifier>{c4607d66-1c67-412f-9e6a-4a10e48017ed}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="trajectory.h">
@@ -72,6 +75,12 @@
     <ClInclude Include="typedef.h">
       <Filter>head</Filter>
     </ClInclude>
+    <ClInclude Include="util\serialize.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\argparse.h">
+      <Filter>util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="trajectory.cpp">
@@ -107,11 +116,6 @@
     <ClCompile Include="smiles\smiles.cpp">
       <Filter>smiles</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="update.txt">
-      <Filter>head</Filter>
-    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />

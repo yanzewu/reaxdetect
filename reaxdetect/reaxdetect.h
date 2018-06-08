@@ -7,13 +7,13 @@
 #ifndef REAXDETECT_H
 #define REAXDETECT_H
 
-#include <string>
-#include <map>
-
 #include "analyzer.h"
 #include "reaxreader.h"
 #include "simulation.h"
-#include "util/config.h"
+#include "util/serialize.h"
+
+#include <string>
+#include <map>
 
 using namespace std;
 
@@ -25,27 +25,25 @@ public:
 	ReaxDetect();
 
 	// initialize arguments
-	int init(int argc, char** argv);
+	int init(int argc, const char** argv);
 
 	// execute
 	int exec();
 
 private:
 
-	int read_opt(int argc, char** argv);
+	int read_opt(int argc, const char** argv);
 
 	void set_default_opt();
 
 	void translate_opt();
-
-    static void display_help();
 
 	static void display_version();
 
 	static int read_boc(const string& filename, map<int, Arrayd>&);
 
 	Simulation simulation;
-	ConfigReader cfg_reader;
+    Serializer config;
 	ReaxTrajReader::Config config_traj;
 	ReaxReader::Config config_reax;
 
