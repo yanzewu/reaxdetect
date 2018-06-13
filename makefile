@@ -14,8 +14,8 @@ ANALYZER_H = analyzer.h $(REAXREADER_H)
 
 analyzer.o : elements.h vecutil.h $(ANALYZER_H) 
 datawriter.o : datawriter.h errors.h elements.h path.h strutil.h $(ANALYZER_H)
-main.o : reaxdetect.h config.h $(ANALYZER_H)
-reaxdetect.o : $(ANALYZER_H) datawriter.h errors.h reaxdetect.h elements.h path.h strutil.h
+main.o : reaxdetect.h serialize.h $(ANALYZER_H)
+reaxdetect.o : $(ANALYZER_H) datawriter.h errors.h reaxdetect.h elements.h path.h strutil.h serialize.h
 reaxreader.o : $(REAXREADER_H) algorithmutil.h path.h 
 reaxreader_mol.o : $(REAXREADER_H) algorithmutil.h 
 reaxreader_reac.o : $(REAXREADER_H) algorithmutil.h strutil.h 

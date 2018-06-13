@@ -5,13 +5,11 @@
 #ifndef TRAJECTORY_H
 #define TRAJECTORY_H
 
+#include "simulation.h"
+
 #include <map>
 #include <vector>
 #include <fstream>
-
-#include "simulation.h"
-
-using namespace std;
 
 // Stores atom position and charge.
 struct atom {
@@ -22,7 +20,8 @@ struct atom {
 // Stores bonded pair info.
 struct bond {
     int id_1, id_2;
-    int order;
+    int order;  /* notice: order 0 is a valid option! 
+                If you need output order other than 0-3, please modify ``bond_symbol`` in smiles.cpp*/
     bond() : order(0) {}
     bond(int a, int b) : id_1(a), id_2(b), order(1) {
     }
@@ -30,8 +29,8 @@ struct bond {
 
 // Stores all information in one frame.
 struct TrajFrame {
-    vector<atom> atoms;
-    vector<bond> bonds;
+    std::vector<atom> atoms;
+    std::vector<bond> bonds;
 
     void clear() {
         atoms.clear();
@@ -44,15 +43,24 @@ struct TrajFrame {
 class TrajReader {
 public:
 
-    // Open the trajectory file. Error ==> Return 1, throw; Safe ==> Return 0;
-    virtual int Open(const string&) = 0;
+    // Open the trajectory file. Return non-zero to halt.
+    virtual int Open(const std::string&) = 0;
 
-    // Executed before read first frame. Fill the metadata of simulation.
-    // For trajectory that has no head, you can read first frame here and store it in
-    // a buffer, then output the result when ReadTrjFrame is first called.
+    /* Executed before read first frame. Return non-zero to halt.
+    The following entries in Simulation class must be filled:
+        - atomNumber: number of atom in the system;
+        - atomWeights: list of atom weights of specified index.
+    You may also modify ``timeStep`` and ``volume`` to overwritten command-line input.
+
+     For trajectory that has no head, you can read first frame to get information and store it in
+     a buffer, then output other information when ``ReadTrjFrame`` is first called.
+    */
     virtual int ReadTrjHead(Simulation*) = 0;
 
-    // Executed in the read loop.
+    /* Executed in the read loop. Return non-zero to halt.
+    If the system condition (atomWeights, timeStep, volume) is dynamically changed, you may remove the ``const`` before
+    Simulation&. However, some other places may also changed. But the code should work as long as it can be compiled.
+    */
     virtual int ReadTrjFrame(TrajFrame&, const Simulation&) = 0;
 };
 
@@ -62,8 +70,8 @@ class ReaxTrajReader : public TrajReader {
 public:
 
 	struct Config {
-		map<int, vector<double> > bondorder_cutoff;
-		vector<double> bondorder_cutoff_default;
+		std::map<int, std::vector<double> > bondorder_cutoff;
+		std::vector<double> bondorder_cutoff_default;
 
 		int read_atompos;
 		int count_bondorder;
@@ -71,14 +79,14 @@ public:
 		}
 	};
 	
-	map<int, vector<double> > bondorders; // Bond order statistics
+	std::map<int, std::vector<double> > bondorders; // Bond order statistics
 
 	ReaxTrajReader() : config() {
 	}
 	ReaxTrajReader(const Config& c) : config(c){
 	}
 
-	int Open(const string& path);
+	int Open(const std::string& path);
 
 	int ReadTrjHead(Simulation* simulation);
 
@@ -86,7 +94,10 @@ public:
 
 private:
 	Config config;
-	ifstream trjfile;
+	std::ifstream trjfile;
 	int frameCount;
 };
+
+#define DefaultTrajReader ReaxTrajReader // <================= Change your own trajectory reader here
+
 #endif // !TRAJECTORY_H

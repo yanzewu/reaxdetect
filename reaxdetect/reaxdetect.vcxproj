@@ -138,7 +138,6 @@
     <ClInclude Include="typedef.h" />
     <ClInclude Include="util\algorithmutil.h" />
     <ClInclude Include="util\argparse.h" />
-    <ClInclude Include="util\config.h" />
     <ClInclude Include="util\elements.h" />
     <ClInclude Include="util\path.h" />
     <ClInclude Include="util\serialize.h" />

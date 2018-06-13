@@ -70,7 +70,7 @@ int ReaxDetect::exec() {
 	ReaxDataWriter writer;
 	ReaxReader reader(config_reax);
 
-	ReaxTrajReader traj(config_traj);   // change "ReaxTrajReader" to your own reader class here
+    DefaultTrajReader traj(config_traj);
     traj.Open(input_path);
     traj.ReadTrjHead(&simulation);      // read necessary metadata
 
@@ -185,7 +185,7 @@ void ReaxDetect::set_default_opt()
     });
 }
 
-void ReaxDetect::display_version() {
-	printf("Reaction Detector: Version %d.%d.%d\n", MYVERSION / 10000, (MYVERSION / 100) % 100, MYVERSION % 100);
+void ReaxDetect::display_version()const {
+	printf("Reaction Detector: Version %s\n", version_str);
 }
 

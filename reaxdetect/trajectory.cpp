@@ -6,6 +6,8 @@
 #include "util/algorithmutil.h"
 #include "util/strutil.h"
 
+using namespace std;
+
 #define DATA_LENGTH		24
 #define LINE_LENGTH		62
 #define MAX_ATOM_TYPE	256

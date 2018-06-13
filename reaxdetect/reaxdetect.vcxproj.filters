@@ -69,9 +69,6 @@
     <ClInclude Include="smiles\tablesort.h">
       <Filter>smiles</Filter>
     </ClInclude>
-    <ClInclude Include="util\config.h">
-      <Filter>util</Filter>
-    </ClInclude>
     <ClInclude Include="typedef.h">
       <Filter>head</Filter>
     </ClInclude>

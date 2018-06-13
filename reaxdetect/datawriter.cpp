@@ -24,12 +24,12 @@ int ReaxDataWriter::Dump(const string& path, const string& path_reac, const Reax
 	}
 
 	for (const auto& fs : reader.fss) {
-		fprintf(outfile_c, "\n%.2f", fs.t);
+		fprintf(outfile_c, "\n%.2g", fs.t);
 		for (const auto& c : fs.mol_freq) {
 			fprintf(outfile_c, ",%d", c);
 		}
 
-		fprintf(outfile_r, "\n%.2f", fs.t);
+		fprintf(outfile_r, "\n%.2g", fs.t);
 		for (const auto& r : fs.reaction_freq) {
 			fprintf(outfile_r, ",%d,%d", r.first, r.second);
 		}
@@ -50,11 +50,11 @@ int ReaxDataWriter::WriteReport(const string & path, const ReaxAnalyzer & analyz
 
 	fprintf(outfile, "Molecules:\nindex,name,life(ps)\n");
 	for (size_t i = 0; i < analyzer.species.size(); i++) {
-		fprintf(outfile, "%zd,%s,%.3f\n", i, analyzer.species[i].c_str(), analyzer.species_life[i]);
+		fprintf(outfile, "%zd,%s,%.3g\n", i, analyzer.species[i].c_str(), analyzer.species_life[i]);
 	}
-	fprintf(outfile, "Reactions\nindex,reaction,freqplus,freqminus\n");
+	fprintf(outfile, "Reactions\nindex,reaction,freqforward,freqbackward\n");
 	for (size_t i = 0; i < analyzer.reactions.size(); i++) {
-		fprintf(outfile, "%zd,%s,%d,%d\n", i, analyzer.reactions[i].c_str(), analyzer.rp[i], analyzer.rm[i]);
+		fprintf(outfile, "%zd,%s,%d,%d\n", i, analyzer.reactions[i].c_str(), analyzer.freq_f[i], analyzer.freq_b[i]);
 	}
 	fclose(outfile);
 	return 0;

@@ -1,9 +1,4 @@
-/* ReaxDetect 
- * A tool analyzing LAMMPS trajectory file with Reaction Force Field.
- * Written by Yanze Wu (https://github.com/flipboards)
-*/
 
-#pragma once
 #ifndef REAXDETECT_H
 #define REAXDETECT_H
 
@@ -16,8 +11,6 @@
 #include <map>
 
 using namespace std;
-
-#define MYVERSION 30101
 
 // main entry for the program
 class ReaxDetect {
@@ -38,7 +31,7 @@ private:
 
 	void translate_opt();
 
-	static void display_version();
+	void display_version()const;
 
 	static int read_boc(const string& filename, map<int, Arrayd>&);
 
@@ -52,7 +45,7 @@ private:
 	string config_path;
 
 	const string default_config_path = "reacdetect.ini";
-
+    const char* version_str = "2018v2 alpha";
 };
 
 #endif // !REAXDETECT_H

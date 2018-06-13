@@ -15,16 +15,17 @@ public:
 	vector<string> reactions;
 
 	Arrayd species_life;
-	Array rp, rm;
+	Array freq_f, freq_b;   // Forward and backward occurences
 
 	ReaxAnalyzer() {
 	}
 
-	void HandleData(const ReaxReader& rs, const Simulation&);
+    // Handles data of ReaxReader, which must be invoked ReaxReader.HandleData first
+	void HandleData(const ReaxReader&, const Simulation&);
 
 private:
 
-	void CalcMolLife(const ReaxReader& rs, double timeStep);
+	void CalcMolLife(const ReaxReader&, double timeStep);
 
 };
 

@@ -30,7 +30,7 @@ bool ReaxReader::MatMolecule::operator==(const MatMolecule& othermlc)const {
 	return true;
 
 }
-bool ReaxReader::MatMolecule::equals_to(MatMolecule & othermlc)
+bool ReaxReader::MatMolecule::has_same_atoms(MatMolecule & othermlc)
 {
 	return contain_equal(atoms, othermlc.atoms, less<int>(), equal_to<int>());
 }

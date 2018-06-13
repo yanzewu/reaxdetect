@@ -1,13 +1,11 @@
-#pragma once
 
 #ifndef SIMULATION_H
 #define SIMULATION_H
 
 #include <vector>
 
-    // Metadata of simulation (either read / input by user)
+    // Metadata of simulation (either read from trajectory or input by user)
 struct Simulation {
-	double temp;        // Temperature
 	int atomNumber;     // Number of atoms
 	double timeStep;    // Frame timestep
 	double volume;      // Volume

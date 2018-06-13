@@ -1,100 +1,87 @@
-# ReaxDetect Manual 
+# ReaxDetect - Reaction Analysis of Atomistic Simulation Trajectory
+
+ReaxDetect aims at extracting time evolution of reaction and species information from atomistic simulation (includes ReaxFF, Ab-inito MD, Quantum Chemistry, etc.). ReaxDetect detects molecule fragment based on connectivity and reactions based on connectivity-change. The species are outputed in Canonicalized ``SMILES`` format. By default, ReaxDetect accepts ReaxFF trajectory as input, but an alternative trajectory parser can be easily written and integrated.
+
+## Example
+
+Analysis for a system with volume=512000 A^3 and frame interval=1.0 ps:
+
+    $ reaxdetect -v 512000 -t 1.0 trajectory.trj
+
+Alternatively:
+    
+    $ echo '{"volume":512000, "t":1.0}' > config.json
+    $ reaxdetect -c config.json trajectory.trj
 
 ## Installation
 
-Requirement: C++14 supported compiler; GCC 5.0+ recommended.
+Prerequisties: C++14 supported compiler (*nix); Visual Studio 2017 (Windows).
 
-Install command:
+Install command (*nix):
 
     make
 
-## Usage: 
+Windows:
+
+    msbuild /p:Configuration=Release
+
+## Command-line Options:
+SYNOPSIS:
 
 	reaxdetect [OPTIONS...] FILE
 
-### OPTIONS
+OPTIONS
 
--b [buffer_size]:   How many frames used to scan reaction. Default is 2. If large than 2, will eliminate reversed reactions after 'buffer_size-1' frames after a recognition.
+- -c, --config [CONFIG]: Load external configuration file. If not specified, the name is 'reacdetect.ini'.
+- -b, --RecognizeBegin [BEGIN]: Integer, begin frame number of trajectory reading. Default is 0.
+- -s, --RecognizeInterval [BEGIN]: Integer, step of trajectory reading.
+- -m, --RecognizeLimit [BEGIN]: Integer, maximum frame number of trajectory reading, Default is -1 (end).
+- -t, --timestep [TIMESTEP]: Float, timestep of trajectory file. Default is 0.0 and reading from trajectory.
+- -v, --volume [VOLUME]: Volume of system. Default is 1.0.
+- -h, --help: Display help.
+--version: Display version.
 
--c [config_file]:   Load external configuration file. If not specified, the name is 'reacdetect.ini'.
+FILE
 
---config:           Write default configuration to file 'reacdetect.ini'.
-
---dump=[dumpoption]:  Control raw output (reactions and species in each frame). dumpoption can be:
-- nodump: Do not dump;
-- full: Dump all.
-
--f [step]:          How many frames as a step in reading trajectory file.
-
--h, --help:         Display help.
-
--l [limit]:         Maximum number of frame recognized. 
-
--s [sampeinterval]: Number of frames used in sample.
-
--t [timestep]:      Timestep of trajectory file. Default is reading from trajectory.
-
--v [volume]:        Volume of system. Default is 1.0.
-
---version:          Display version.
-
-### FILE
-
-The trajectory file is specified from lammps command:
+By default, trajectory file is the control file output from ``LAMMPS`` command:
 
     pair_style reax/c [control_file]
 
-In the control_file, "atom_info" and "bond_info" must be set to 1. While "atom_forces", "atom_velocities" and "angle_info" must be set to 0.
+In the control_file, ``atom_info`` and ``bond_info`` must be set to 1, ``atom_forces``, ``atom_velocities`` and ``angle_info`` must be set to 0.
 
+## Extended Configuration
 
-### Configuration file
+Configuration file is in json format, with options below:
 
-BondOrderCutoff:    Filename of cutoff description file. Use "default" to use default values. Format of cutoff description file:
+BondOrderCutoff: Filename of cutoff description file. Use "default" to disable. Format of cutoff description file is:
     
     A-B c0,c1,c2,...
 
-Where A, B is atom name, and A must be ahead of B in periodic table. c0, c1, c2 are cutoff for different bond order.
+Where A, B is atom name, and A must be __ahead__ of B in periodic table. c0, c1, c2 are step cutoff for bond order 0, 1, 2,... sequentially. Note: 0 is a valid value for bond order, representing weak connections.
+
 If a bond is not in cutoff description, default value is used.
 
-BondOrderCutoffDefault: Cutoff for each type of bond order if not specified in BondOrderCutoff. Format is same as above.
+BondOrderCutoffDefault: Cutoff for each type of bond order if not specified in ``BondOrderCutoff``. Format is same (c0,c1,c2,...).
 
 CountBondOrder:     Frame step for bond order statistics. Set '0' to disable. The bond orders will be written in '[name]_bondorder.csv'.
 
 FrameBufferSize:    Same as '-b' option.
 
-ReadAtomPos:        true/false. For future use.
-
-RecognizeBegin:     Begin frame number of trajectory analyzation.
-
-RecognizeInterval:  Same as '-f' option.
-
-RecognizeLimit:     Same as '-l' option.
-
-SampleMethod:       How to get samples in trajectory. Currently only "fixint" is available.
-
-SampleInterval:     Same as '-s' option.
-
-SampleRange:        Range for sampling. If different from 'SampleInterval', take only 'SampleRange' frames to average in sampling.
+ReadAtomPos:        0/1, whether parsing atom positions or simply skipping them in ReaxFF trajectory.
 
 
 ## Output
 
 All files are in csv format.
 
-Raw frequency file (\*\_rawfreq.csv):  Data for kinetic calculation based on power law.
+- Dump file (\*\_full\_dump.csv, \*\_full\_reac.csv): Species and reaction frequency in each frame.
+- Report file (\*\_full_report.csv):     Basic analysis of trajectory read, including species lifetimes.
+- Bondorder file (\*\_boc.csv):          Bond order of each type of bond. Based on row. Only output when ``CountBondOrder`` != 0.
 
-Sample file (\*\_sample.csv):          Sample of reaction trajectory (how many species and reactions).
+## Alternative Trajectory Reader
 
-Report file (\*\_full_report.csv):     Basic data in analyzation. Life of species.
+You may write your own trajectory reader based on the interface of ``TrajReader`` at [trajectory.h](reaxdetect/trajectory.h). Details are described in the file.
 
-Dump file (\*\_full\_dump.csv, \*\_full\_reac.csv): Species and reaction number in each frame, respectively. Only output when dump=full.
+## Citing
 
-Bondorder file (\*\_boc.csv):          Bond order of each type of bond. Based on row. Only 
-
-
-## Example
-
-Analyzation for a system with volume=512000 A^3 and frame interval=1.0 ps:
-
-    $ reaxdetect --config
-    $ reaxdetect -v 512000 -t 1.0 trajectory.trj
+If you use (part of) this program for academic research, please consider citing [].

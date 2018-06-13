@@ -16,40 +16,53 @@
 
 int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 {
+
+    /* Main logic of ReaxDetect */
+
 	printf("Buffer size=%zd\n", config.buffer_size);
 	printf("Read interval=%d\n", config.recognize_interval);
 	printf("Read begin=%d\n", config.recognize_begin);
 	printf("Read end=%d\n", config.recognize_limit);
 
-	_buffer_pages = new BufferPage[config.buffer_size];
-
-	InitBuffer(simulation.atomNumber + 1);
     TrajFrame _frame;
-	size_t i = 0;
-	size_t buffer_i = 0;
-	while (reader.ReadTrjFrame(_frame, simulation)) {
-		if (i % config.recognize_interval == 0 && i >= config.recognize_begin) {
+	size_t i = 0;           // how many frames readed
+	size_t frame_i = 0;     // how many frames analyzed
+    _crt_buffer = nullptr;
+    _prev_buffer.clear();
+
+    // Main loop
+	while (reader.ReadTrjFrame(_frame, simulation)) {   // read a frame from simulation trajectory
+
+		if (i % config.recognize_interval == 0 && i >= config.recognize_begin) {    // if should parse
 			FrameStat fstat;
-			fstat.t = simulation.timeStep * i;
-			RecognizeMolecule(_frame, simulation.atomWeights, simulation.atomNumber, fstat);
-			RecognizeReaction(_frame);
+			fstat.t = simulation.timeStep * i;  // time
+
+            RenewBuffer(config.buffer_size, simulation.atomNumber + 1);
+			RecognizeMolecule(_frame, simulation.atomWeights, simulation.atomNumber, fstat);    // analyze connectivity; write molecule info, connectivity to buffer
+			RecognizeReaction(_frame);  // detect reactions; write reaction info to buffer; check reverse reactions;
 			fss.push_back(fstat);
-			if (buffer_i >= config.buffer_size - 1) {
-				CommitReaction(fss[buffer_i - config.buffer_size + 1]);
+			if (frame_i >= config.buffer_size - 1) {
+				CommitReaction(fss[frame_i - config.buffer_size + 1]); // the reverse reactions have been checked, write the final reaction frequency in.
 			}
-			SwapBuffer();
-			buffer_i++;
+			frame_i++;
 		}
 		i++;
+        if (i % config.verbose_interval == 0) {
+            printf("Frame read: %zd\n", i);
+        }
 		if (i == config.recognize_limit) {
 			break;
 		}
         _frame.clear();
 	}
-	for (size_t j = buffer_i - config.buffer_size + 1; j < buffer_i; j++) {
+	for (size_t j = frame_i - config.buffer_size + 1; j < frame_i; j++) {
 		CommitReaction(fss[j]);
 	}
 	printf("Total %zd frames read, with %zd molecules and %zd reactions.\n", fss.size(), molecules.size(), reactions.size());
+
+    if (_crt_buffer) {
+        delete _crt_buffer;
+    }
 
 	printf("Encoding smiles...\n");
 	for (auto& mol : molecules) {
@@ -62,8 +75,6 @@ int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 		fs.reaction_freq.resize(reactions.size());
 	}
 
-	delete[] _buffer_pages;
-
 #ifdef _DEBUG
 	Check();
 #endif // _DEBUG
@@ -72,43 +83,31 @@ int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 
 //----------------middle api------------------
 
-void ReaxReader::InitBuffer(size_t max_atom_idx)
-{
-	_prev_buffer.clear();
-	_crt_buffer = &_buffer_pages[0];
-	for (BufferPage* page = _buffer_pages; page != _buffer_pages + config.buffer_size; page++) {
-		page->mol_of_atom.assign(max_atom_idx, -1);
-		page->bond_matrix.resize(max_atom_idx);
-		page->atom_score.resize(max_atom_idx);
-	}
+void ReaxReader::RenewBuffer(unsigned max_buffer_num, size_t max_atom_idx) {
+
+    if (_prev_buffer.size() >= config.buffer_size - 1) {
+        delete _prev_buffer.back();
+        _prev_buffer.pop_back();
+    }
+    if (_crt_buffer) {
+        _prev_buffer.push_front(_crt_buffer);
+    }
+
+    _crt_buffer = new BufferPage;
+    _crt_buffer->mol_of_atom.assign(max_atom_idx, -1);
+    _crt_buffer->bond_matrix.resize(max_atom_idx);
+    _crt_buffer->atom_score.resize(max_atom_idx);
 }
 
-void ReaxReader::SwapBuffer() {
-	if (_prev_buffer.size() >= config.buffer_size - 1) {
-		_prev_buffer.pop_back();
-	}
-	_prev_buffer.push_front(_crt_buffer);
-	_crt_buffer = _buffer_pages + (_crt_buffer + 1 - _buffer_pages) % config.buffer_size;
-
-	_crt_buffer->molecule.clear();
-	_crt_buffer->mol_idx.clear();
-	_crt_buffer->raw_reaction.clear();
-	_crt_buffer->reaction.clear();
-
-	for (auto& m : _crt_buffer->mol_of_atom)
-		m = -1;
-	for (auto& a : _crt_buffer->atom_score)
-		a = 0;
-	for (auto& b : _crt_buffer->bond_matrix)
-		b.clear();
-}
 void ReaxReader::RecognizeMolecule(const TrajFrame& frm, const Arrayd& atomWeights, int atomNumber, FrameStat& fs)
 {
+    // 1. build bonding matrix
 	for (const auto& bnd : frm.bonds) {
 		_crt_buffer->bond_matrix[bnd.id_1].push_back({ bnd.id_2, bnd.order });
 		_crt_buffer->bond_matrix[bnd.id_2].push_back({ bnd.id_1, bnd.order });
 	}
-	//1.first scan(DFS): get score, root, and mol of atoms: O(N)
+
+	// 2. first scan(DFS): Scan atom groups. Assign to molRoots, mol_of_atom
 	Array molRoots;//root of molecules
 	Mark marks = new bool[atomNumber + 1]{ false };
 
@@ -117,13 +116,14 @@ void ReaxReader::RecognizeMolecule(const TrajFrame& frm, const Arrayd& atomWeigh
 		molRoots.push_back(i);
 		scan_score(i, atomWeights, _crt_buffer, marks, molRoots);
 	}
-	//2.sort bondmatrix: O(N*k^2)
+
+	// 3. sort bondmatrix: O(N*k^2) for MatMolecule comparision;
 	for (auto bonds = _crt_buffer->bond_matrix.begin() + 1; bonds != _crt_buffer->bond_matrix.end(); bonds++) {
 		sortby_pair(*bonds, _crt_buffer->atom_score, greater<int>());
 	}
 	memset(marks, 0, sizeof(bool)*(atomNumber + 1));
 
-	//3.second scan(DFS): get molecule list: O(N)
+	// 4. second scan(DFS): assign MatMolecule (intermediate representation) list
 	for (const auto& root : molRoots) {
 		MatMolecule molecule(&_crt_buffer->bond_matrix, &_crt_buffer->atom_score);
 		scan_molecule(root, _crt_buffer, marks, molecule);
@@ -131,16 +131,16 @@ void ReaxReader::RecognizeMolecule(const TrajFrame& frm, const Arrayd& atomWeigh
 	}
 	delete[] marks;
 	
-	//4.compress trees: O(N*m)
-	vector<tsize_t> uroots;		//index in molbuffer
-	Array uFreq;		//freq corresponding to molecules.
-	_crt_buffer->mol_idx.resize(molRoots.size());
+	// 5. count MatMolecule frequency O(N*m). This step is to reduce the frequency of SMILES generation (only performed at unique MatMolecule) rather than all MatMolecules.
+	vector<tsize_t> uroots;     // Unique Matmolecule index list. Other molecules in buffer->molecule must be same as one of them.
+	Array uFreq;		        // Frequency of each unique MatMolecule in frame.
+	_crt_buffer->mol_id.resize(molRoots.size());
 
 	for (tsize_t i = 0; i < _crt_buffer->molecule.size(); i++) {
-		_crt_buffer->mol_idx[i] = (int)pushnew2index(i, _crt_buffer->molecule, uroots, uFreq);
+		_crt_buffer->mol_id[i] = (int)pushnew2index(i, _crt_buffer->molecule, uroots, uFreq);  // here mol_id stores frequency of MatMolecule
 	}
 
-	//5.final: get smiles: O(m^2*log(m))
+	// 6. generating smiles: O(m^2*log(m)). Only performed on each MatMolecule.
 	Array uindex(uroots.size());
 	fs.mol_freq.resize(molecules.size());
 	for (tsize_t i = 0; i < uroots.size(); i++) {
@@ -157,8 +157,9 @@ void ReaxReader::RecognizeMolecule(const TrajFrame& frm, const Arrayd& atomWeigh
 			uindex[i] = (int)molecules.size() - 1;
 		}
 	}
-	//6.restore uindex to index: O(N)
-	for (auto& molindex : _crt_buffer->mol_idx) {
+
+	// 7. Replacing MatMolecule frequency to SMILES frequency.
+	for (auto& molindex : _crt_buffer->mol_id) {
 		molindex = uindex[molindex];
 	}
 }
@@ -184,14 +185,16 @@ void ReaxReader::RecognizeReaction(const TrajFrame& frm)
 			auto next_buffer = _prev_buffer.begin();
 			auto scan_buffer = next_buffer++;
 
-			// look up previous buffer for quick-reverse reactions
+			// look up previous buffer to remove reverse reactions
 			for (; next_buffer != _prev_buffer.end(); scan_buffer = next_buffer++) {
 				auto reaction_scanned = (*scan_buffer)->reaction.begin();
 				auto raw_reaction_scanned = (*scan_buffer)->raw_reaction.begin();
 
 				for (; reaction_scanned != (*scan_buffer)->reaction.end(); reaction_scanned++, raw_reaction_scanned++)
 				{
-					if (reaction_rev != *reaction_scanned)continue;
+					if (reaction_rev != *reaction_scanned)continue; // two reactions does not share same formula ==> must be different
+
+                    // share same formula ==> chceck if atoms are identical.
 					if (check_reaction(raw_reaction_rev, _prev_buffer.front(), _crt_buffer, *raw_reaction_scanned, *scan_buffer, *next_buffer)) {
 						(*scan_buffer)->raw_reaction.erase(raw_reaction_scanned);
 						(*scan_buffer)->reaction.erase(reaction_scanned);
@@ -292,17 +295,17 @@ void ReaxReader::scan_molecule(int index, BufferPage* buffer, Mark marks, MatMol
 	}
 }
 
-void ReaxReader::create_reaction(int index, BufferPage* buffer_host, BufferPage* buffer_guest, vector<bool>* marks, Reaction& reac, Reaction& raw_reac, unsigned char flag) {
+void ReaxReader::create_reaction(int index, const BufferPage* buffer_host, const BufferPage* buffer_guest, vector<bool>* marks, Reaction& reac, Reaction& raw_reac, unsigned char flag) {
 	//flag = 0/1, means reagant/product
 	//it is a quick step, so don't take it too seriously.
 	//DFS
 	marks[flag][index] = true;
 	if (flag == FLAG_PRODUCT) {
-		reac.products.push_back(buffer_host->mol_idx[index]);
+		reac.products.push_back(buffer_host->mol_id[index]);
 		raw_reac.products.push_back(index);
 	}
 	else {
-		reac.reagants.push_back(buffer_host->mol_idx[index]);
+		reac.reagants.push_back(buffer_host->mol_id[index]);
 		raw_reac.reagants.push_back(index);
 	}
 
@@ -318,23 +321,23 @@ void ReaxReader::create_reaction(int index, BufferPage* buffer_host, BufferPage*
 bool ReaxReader::check_reaction(Reaction & reaction_1, BufferPage* buffer_1_prod, BufferPage* buffer_1_reac,
 	Reaction & reaction_2, BufferPage* buffer_2_prod, BufferPage* buffer_2_reac)
 {
-	sortby(reaction_1.reagants, buffer_1_reac->mol_idx, less<int>());
-	sortby(reaction_2.reagants, buffer_2_reac->mol_idx, less<int>());
+	sortby(reaction_1.reagants, buffer_1_reac->mol_id, less<int>());
+	sortby(reaction_2.reagants, buffer_2_reac->mol_id, less<int>());
 
 	auto mol_1 = reaction_1.reagants.begin(), mol_2 = reaction_2.reagants.begin();
 	for (; mol_1 != reaction_1.reagants.end(); mol_1++, mol_2++) {
-		if (!buffer_1_reac->molecule[*mol_1].equals_to(buffer_2_reac->molecule[*mol_2])) {
+		if (!buffer_1_reac->molecule[*mol_1].has_same_atoms(buffer_2_reac->molecule[*mol_2])) {  // if *EXACTLY* identical ==> remove.
 			return false;
 		}
 	}
 
-	sortby(reaction_1.products, buffer_1_prod->mol_idx, less<int>());
-	sortby(reaction_2.products, buffer_2_prod->mol_idx, less<int>());
+	sortby(reaction_1.products, buffer_1_prod->mol_id, less<int>());
+	sortby(reaction_2.products, buffer_2_prod->mol_id, less<int>());
 
 	mol_1 = reaction_1.products.begin(); 
 	mol_2 = reaction_2.products.begin();
 	for (; mol_1 != reaction_1.products.end(); mol_1++, mol_2++) {
-		if (!buffer_1_prod->molecule[*mol_1].equals_to(buffer_2_prod->molecule[*mol_2])) {
+		if (!buffer_1_prod->molecule[*mol_1].has_same_atoms(buffer_2_prod->molecule[*mol_2])) {
 			return false;
 		}
 	}

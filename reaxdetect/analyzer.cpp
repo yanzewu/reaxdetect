@@ -56,24 +56,24 @@ void ReaxAnalyzer::CalcMolLife(const ReaxReader& rs, double timeStep)
 	//the reagants need to be treated specially
 	veccpy(rs.fss[0].mol_freq, inflow);
 
-	rp.assign(reactions.size(), 0);
-	rm.assign(reactions.size(), 0);
+	freq_f.assign(reactions.size(), 0);
+	freq_b.assign(reactions.size(), 0);
 
 	//effective area
 	for (const auto& fs : rs.fss) {
 		c_integral += fs.mol_freq;
 		for (size_t i = 0; i < reactions.size(); i++) {
-			rp[i] += fs.reaction_freq[i].first;
-			rm[i] += fs.reaction_freq[i].second;
+			freq_f[i] += fs.reaction_freq[i].first;
+			freq_b[i] += fs.reaction_freq[i].second;
 		}
 	}
 
 	for (unsigned int j = 0; j < rs.reactions.size(); j++) {
 		for (const auto& s : rs.reactions[j].products) {
-			inflow[s] += rp[j];
+			inflow[s] += freq_f[j];
 		}
 		for (const auto& s : rs.reactions[j].reagants) {
-			inflow[s] += rm[j];
+			inflow[s] += freq_b[j];
 		}
 	}
 
