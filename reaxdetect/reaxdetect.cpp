@@ -46,7 +46,10 @@ void ReaxDetect::translate_opt()
 
     input_path = config.at<string>("file");
 
-	config_traj = ReaxTrajReader::Config();
+    /* NOTICE: If you want to use your own configer. You may change the code 
+        about ``config_traj`` below in order to receive UI input.
+    */
+    config_traj = DefaultTrajConfig();
 	config_traj.read_atompos = config.at<int>("ReadAtomPos");
 	config_traj.count_bondorder = config.at<int>("CountBondOrder");
 	for (const auto& c : split(config.at<string>("BondOrderCutoffDefault"), -1, ',')) {
@@ -123,6 +126,8 @@ int ReaxDetect::read_boc(const string & filename, map<int, Arrayd>& bondorder_cu
 int ReaxDetect::read_opt(int argc, const char** argv) {
 
     ArgParser parser;
+
+    // Set command line argument here. The usage is similar to ``argparse`` in Python.
     parser.add_argument("-c", "--config", 1);
     parser.add_argument("-b", "--RecognizeBegin", 1);
     parser.add_argument("-s", "--RecognizeInterval", 1);
@@ -168,6 +173,8 @@ int ReaxDetect::read_opt(int argc, const char** argv) {
 
 void ReaxDetect::set_default_opt()
 {
+    /* Set the default argument here. The input entry for argument is automatically created.
+    */
     config.set_default({
         {"BondOrderCutoff", "default"},
         {"BondOrderCutoffDefault", "0.5,0.5"},

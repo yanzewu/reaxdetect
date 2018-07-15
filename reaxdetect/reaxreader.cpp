@@ -55,6 +55,8 @@ int ReaxReader::HandleData(TrajReader& reader, const Simulation& simulation)
 		}
         _frame.clear();
 	}
+    
+    RenewBuffer(config.buffer_size, simulation.atomNumber + 1);
 	for (size_t j = frame_i - config.buffer_size + 1; j < frame_i; j++) {
 		CommitReaction(fss[j]);
 	}

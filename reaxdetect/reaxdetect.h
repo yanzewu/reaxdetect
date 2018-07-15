@@ -37,7 +37,7 @@ private:
 
 	Simulation simulation;
     Serializer config;
-	ReaxTrajReader::Config config_traj;
+	DefaultTrajConfig config_traj;
 	ReaxReader::Config config_reax;
 
 	string input_path;

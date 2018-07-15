@@ -13,6 +13,8 @@ class ArgParseError : public std::runtime_error {
 
 typedef std::map<std::string, std::vector<std::string> > ArgList;
 
+/* Pythonic argument parser
+*/
 class ArgParser {
 public:
 
@@ -33,7 +35,7 @@ public:
         }
     }
 
-    // require_arg: 0/1/+
+    // add a new argument with certain flags. nargs: 0/1/+
     void add_argument(const std::string& short_name, const std::string& long_name, char nargs = 1) {
         if (!_is_option(long_name) || !_is_option(short_name) || !_is_long_option(long_name)) {
             throw std::runtime_error("Not a valid option");
@@ -41,6 +43,7 @@ public:
         options.push_back({ long_name.substr(2), short_name, long_name, nargs == '+' ? (unsigned)-1 : nargs});
     }
 
+    // add a new argument with certain flags.
     void add_argument(const std::string& name, char nargs = 1) {
         if (_is_option(name)) {
             if (!_is_long_option(name)) {
@@ -54,11 +57,12 @@ public:
         }
     }
 
+    // set the name of program
     void set_prog_name(const std::string& name) {
         prog_name = name;
     }
 
-    // first argument will be ignored
+    // parse the command line. first argument will be ignored
     ArgList parse(int argc, const char** argv) {
         std::vector<std::string> strlist;
 
@@ -68,6 +72,7 @@ public:
         return parse(strlist);
     }
 
+    // parse a list of string.
     ArgList parse(const std::vector<std::string>& strlist) {
         ArgList result;
         auto parg = positional_options.begin();
@@ -109,6 +114,7 @@ public:
         return result;
     }
 
+    // Display help string.
     void display_help(std::ostream& os) {
         
         auto to_upper = [](const std::string& s){

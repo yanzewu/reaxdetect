@@ -1,0 +1,1 @@
+reaxdetect -v 512000 -t 0.01 -c config.json example.trj 

@@ -99,5 +99,6 @@ private:
 };
 
 #define DefaultTrajReader ReaxTrajReader // <================= Change your own trajectory reader here
+#define DefaultTrajConfig ReaxTrajReader::Config // <========== Change your own trajectory reader config here
 
 #endif // !TRAJECTORY_H

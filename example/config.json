@@ -1,0 +1,7 @@
+{
+	"BondOrderCutoff":"boc.txt",
+	"BondOrderCutoffDefault":"0.5,0.5",
+	"FrameBufferSize":1,
+	"ReadAtomPos":0,
+	"CountBondOrder":0
+}
