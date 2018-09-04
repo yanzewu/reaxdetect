@@ -1,10 +1,10 @@
 # ReaxDetect - Reaction Analysis of Atomistic Simulation Trajectory
 
-ReaxDetect aims at extracting time evolution of reaction and species information from atomistic simulation (includes ReaxFF, Ab-inito MD, Quantum Chemistry, etc.). ReaxDetect detects molecule fragment based on connectivity and reactions based on connectivity-change. The species are outputed in Canonicalized ``SMILES`` format. By default, ReaxDetect accepts ReaxFF trajectory as input, but an alternative trajectory parser can be easily written and integrated.
+ReaxDetect aims at extracting time evolution of reaction and species information from atomistic simulation (includes ReaxFF, Ab-inito MD, Quantum Chemistry, etc.). ReaxDetect detects molecule fragment based on connectivity and reactions based on connectivity change. The species are outputed in canonicalized [SMILES](http://www.daylight.com/dayhtml/doc/theory/theory.smiles.html) format. By default, ReaxDetect accepts ReaxFF trajectory as input, but an alternative trajectory parser can be easily written and integrated.
 
 ## Example
 
-Analysis for a system with volume=512000 A^3 and frame interval=1.0 ps:
+Analysis for a system with volume 512000 A^3 and frame interval 1.0 ps:
 
     $ reaxdetect -v 512000 -t 1.0 trajectory.trj
 
@@ -28,9 +28,9 @@ Windows:
 ## Command-line Options:
 SYNOPSIS:
 
-	reaxdetect [OPTIONS...] FILE
+	reaxdetect [OPTION] ... [FILE]
 
-OPTIONS
+OPTION
 
 - -c, --config [CONFIG]: Load external configuration file. If not specified, the name is 'reacdetect.ini'.
 - -b, --RecognizeBegin [BEGIN]: Integer, begin frame number of trajectory reading. Default is 0.
@@ -39,7 +39,7 @@ OPTIONS
 - -t, --timestep [TIMESTEP]: Float, timestep of trajectory file. Default is 0.0 and reading from trajectory.
 - -v, --volume [VOLUME]: Volume of system. Default is 1.0.
 - -h, --help: Display help.
---version: Display version.
+- --version: Display version.
 
 FILE
 
@@ -51,17 +51,17 @@ In the control_file, ``atom_info`` and ``bond_info`` must be set to 1, ``atom_fo
 
 ## Extended Configuration
 
-Configuration file is in json format, with options below:
+Configuration file is in JSON format, with options below:
 
 BondOrderCutoff: Filename of cutoff description file. Use "default" to disable. Format of cutoff description file is:
     
     A-B c0,c1,c2,...
 
-Where A, B is atom name, and A must be __ahead__ of B in periodic table. c0, c1, c2 are step cutoff for bond order 0, 1, 2,... sequentially. Note: 0 is a valid value for bond order, representing weak connections.
+Where A, B is atom name, and A must be __ahead__ of B in periodic table. c0, c1, c2 are step cutoff for bond order 0, 1, 2,... sequentially. Note: 0 is also a valid value for bond order, representing weak connections.
 
 If a bond is not in cutoff description, default value is used.
 
-BondOrderCutoffDefault: Cutoff for each type of bond order if not specified in ``BondOrderCutoff``. Format is same (c0,c1,c2,...).
+BondOrderCutoffDefault: Cutoff for each type of bond order if not specified in ``BondOrderCutoff``. The format is same (c0,c1,c2,...).
 
 CountBondOrder:     Frame step for bond order statistics. Set '0' to disable. The bond orders will be written in '[name]_bondorder.csv'.
 
@@ -76,7 +76,7 @@ All files are in csv format.
 
 - Dump file (\*\_full\_dump.csv, \*\_full\_reac.csv): Species and reaction frequency in each frame.
 - Report file (\*\_full_report.csv):     Basic analysis of trajectory read, including species lifetimes.
-- Bondorder file (\*\_boc.csv):          Bond order of each type of bond. Based on row. Only output when ``CountBondOrder`` != 0.
+- Bondorder file (\*\_boc.csv):          Bond order of each type of bond. Based on row. Only output when ``CountBondOrder != 0``.
 
 ## Alternative Trajectory Reader
 
@@ -90,4 +90,4 @@ The ``ReaxDetect::translate_opt()`` serves as an interpretion of external option
 
 ## Citing
 
-If you use (part of) this program for academic research, please consider citing [].
+If you use (part of) this program for academic research, please cite [].
