@@ -59,7 +59,7 @@ public:
 
     /* Executed in the read loop. Return non-zero to halt.
     If the system condition (atomWeights, timeStep, volume) is dynamically changed, you may remove the ``const`` before
-    Simulation&. However, some other places may also changed. But the code should work as long as it can be compiled.
+    Simulation&. Some other places may also need to be changed. But the code should work as long as it can be compiled.
     */
     virtual int ReadTrjFrame(TrajFrame&, const Simulation&) = 0;
 };

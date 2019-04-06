@@ -90,4 +90,5 @@ The ``ReaxDetect::translate_opt()`` serves as an interpretion of external option
 
 ## Citing
 
-If you use (part of) this program for academic research, please cite [].
+If you use (part of) this program for academic research, please cite:
+- Wu, Y., Sun, H., Wu, L., & Deetz, J. D. (2019). Extracting the mechanisms and kinetic models of complex reactions from atomistic simulation data. *Journal of computational chemistry.* [link](https://doi.org/10.1002/jcc.25809)
