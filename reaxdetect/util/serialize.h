@@ -50,6 +50,7 @@ public:
         else {
             throw std::runtime_error("Cannot open input file");
         }
+        merge(other, _data);
     }
 
 

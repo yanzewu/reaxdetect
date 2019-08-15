@@ -44,7 +44,6 @@ private:
 	string input_name;
 	string config_path;
 
-	const string default_config_path = "reacdetect.ini";
     const char* version_str = "2018v2 alpha";
 };
 

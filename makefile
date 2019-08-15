@@ -1,5 +1,5 @@
-CXX = g++
-CXXFLAGS = -O2 -std=c++14
+CXX = g++ 
+CXXFLAGS = -O2 -std=c++14 -g
 EXEC = reaxdetect-dev
 VPATH = reaxdetect:reaxdetect/util:reaxdetect/smiles 
 OBJECTS = analyzer.o datawriter.o main.o reaxdetect.o reaxreader.o reaxreader_mol.o reaxreader_reac.o trajectory.o \
